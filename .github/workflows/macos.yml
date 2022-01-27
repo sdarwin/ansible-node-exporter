@@ -1,0 +1,48 @@
+---
+name: MACOS CI
+'on':
+  pull_request:
+  push:
+    branches:
+      - master
+      - feature/*
+
+jobs:
+  integration:
+    name: Integration
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - macos-10.15
+
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v2
+
+      - name: Check pip packages
+        run: sudo pip3 list
+
+      - name: Install test dependencies.
+        run: sudo pip3 install ansible
+
+      - name: Set up the test environment.
+        run: |
+          cp tests/inventory ./hosts
+          # ansible-galaxy install -r requirements.yml
+
+      - name: Test the playbook's syntax.
+        run: ansible-playbook molecule/default/playbook.yml --syntax-check
+
+      - name: Test the playbook.
+        run: ansible-playbook molecule/default/playbook.yml
+        env:
+          ANSIBLE_FORCE_COLOR: '1'
+
+      - name: Idempotence check.
+        run: |
+          idempotence=$(mktemp)
+          ansible-playbook molecule/default/playbook.yml | tee -a ${idempotence}
+          tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
+        env:
+          ANSIBLE_FORCE_COLOR: '1'

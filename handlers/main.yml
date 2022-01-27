@@ -7,3 +7,4 @@
     state: restarted
   when:
     - not ansible_check_mode
+    - ansible_system == 'Linux'

@@ -1,5 +1,5 @@
 ---
-name: MACOS CI
+name: macos ci
 'on':
   pull_request:
   push:
@@ -30,7 +30,7 @@ jobs:
         run: |
           cp tests/test-inventory ./test-inventory
           cp tests/ansible.cfg ./ansible.cfg
-          # ansible-galaxy install -r test-requirements.yml
+          ansible-galaxy install -r test-requirements.yml
           mkdir -p /Users/runner/.ansible/roles
           ln -s $GITHUB_WORKSPACE /Users/runner/.ansible/roles/cloudalchemy.node_exporter
 
@@ -40,16 +40,24 @@ jobs:
           ls -al /usr/local/bin || true
           ansible-playbook molecule/default/playbook.yml --syntax-check
 
-      - name: Test the playbook.
+      - name: Run the playbook.
         run: |
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
           ansible-playbook molecule/default/playbook.yml
         env:
           ANSIBLE_FORCE_COLOR: '1'
 
+      - name: Test the results
+        run: |
+          export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+          testinfra tests/tests_macos.py
+        env:
+          ANSIBLE_FORCE_COLOR: '1'
+
       - name: Idempotence check.
         run: |
           idempotence=$(mktemp)
+          export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
           ansible-playbook molecule/default/playbook.yml | tee -a ${idempotence}
           tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
         env:

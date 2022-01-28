@@ -13,9 +13,9 @@
       file:
         path: "/etc/node_exporter"
         state: directory
-        owner: root
-        group: root
-        mode: u+rwX,g+rwX,o=rX
+        # owner: root
+        # group: root
+        # mode: u+rwX,g+rwX,o=rX
 
     - name: Copy the node_exporter config file
       template:

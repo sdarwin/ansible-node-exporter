@@ -82,7 +82,7 @@
     - name: Get checksum list from github
       set_fact:
         _checksums: "{{ lookup('url', 'https://github.com/prometheus/node_exporter/releases/download/v' + node_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
-      # run_once: true
+      run_once: true
 
     - name: "Get checksum for {{ go_arch }} architecture"
       set_fact:
@@ -90,5 +90,10 @@
       with_items: "{{ _checksums }}"
       when:
         - ( "{{ ansible_system |lower }}" + "-" + go_arch + ".tar.gz") in item
-  # delegate_to: localhost
+
+    - name: Check how delegate_to deals with system specific vars
+      ansible.builtin.debug:
+        var: ansible_system
+
+  delegate_to: localhost
   when: node_exporter_binary_local_dir | length == 0

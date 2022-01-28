@@ -37,8 +37,6 @@ jobs:
 
       - name: Test the playbook's syntax
         run: |
-          ls -al /usr/local || true
-          ls -al /usr/local/bin || true
           ansible-playbook molecule/default/playbook.yml --syntax-check
 
       - name: Run the playbook

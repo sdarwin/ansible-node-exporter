@@ -8,21 +8,12 @@
     mode: 0644
   notify: restart node_exporter
 
-- name: Create a node_exporter bin directory
-  file:
-    path: "/usr/local/opt/node_exporter/bin"
-    state: directory
-    owner: administrator
-    group: admin
-    mode: u+rwX,g+rwX,o=rX
-
 - name: Copy the node_exporter startup script
   template:
     src: node_exporter_cloudalchemy_services.j2
-    dest: /usr/local/opt/node_exporter/bin/node_exporter_cloudalchemy_services
-    owner: administrator
-    group: admin
-    mode: 0777
+    dest: "{{ _node_exporter_binary_install_dir }}/node_exporter_cloudalchemy_services"
+    owner: root
+    mode: 0775
   notify: restart node_exporter
 
 - block:

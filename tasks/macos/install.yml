@@ -17,6 +17,19 @@
     home: /
   when: _node_exporter_system_user != "root"
 
+- name: check if node_exporter_binary_install_dir directory exists
+  stat:
+    path: "{{ _node_exporter_binary_install_dir }}"
+  register: install_dir_check
+
+- name: Create node_exporter_binary_install_dir
+  file:
+    path: "{{ _node_exporter_binary_install_dir }}"
+    state: directory
+    owner: root
+    mode: u+rwX,g+rwX,o=rX
+  when: not install_dir_check.stat.exists
+
 - block:
     - name: Download node_exporter binary to local folder
       become: false
@@ -47,7 +60,6 @@
         dest: "{{ _node_exporter_binary_install_dir }}/node_exporter"
         mode: 0755
         owner: root
-        group: wheel
       notify: restart node_exporter
       when: not ansible_check_mode
   when: node_exporter_binary_local_dir | length == 0

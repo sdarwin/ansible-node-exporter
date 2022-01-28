@@ -10,5 +10,3 @@
 - name: include windows tasks
   include_tasks: windows/main.yml
   when: ansible_system == 'Win32NT'
-
-

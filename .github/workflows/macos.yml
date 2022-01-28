@@ -45,7 +45,9 @@ jobs:
           ansible-playbook molecule/default/playbook.yml --syntax-check
 
       - name: Test the playbook.
-        run: ansible-playbook molecule/default/playbook.yml
+        run: |
+          export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+          ansible-playbook molecule/default/playbook.yml
         env:
           ANSIBLE_FORCE_COLOR: '1'
 

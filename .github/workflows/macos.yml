@@ -29,9 +29,10 @@ jobs:
       - name: Set up the test environment.
         run: |
           cp tests/test-inventory ./test-inventory
+          cp tests/ansible.cfg ./ansible.cfg
           # ansible-galaxy install -r test-requirements.yml
           mkdir -p /Users/runner/.ansible/role
-          ln -s . /Users/runner/.ansible/role/cloudalchemy.node_exporter
+          ln -s $(pwd) /Users/runner/.ansible/role/cloudalchemy.node_exporter
 
       - name: Test the playbook's syntax.
         run: ansible-playbook molecule/default/playbook.yml --syntax-check

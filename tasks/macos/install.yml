@@ -11,18 +11,18 @@
     name: "{{ _node_exporter_system_user }}"
     groups: "{{ _node_exporter_system_group }}"
     append: true
-    shell: /bin/bash
+    shell: /usr/sbin/nologin
     system: true
     create_home: false
     home: /
   when: _node_exporter_system_user != "root"
 
-- name: check if node_exporter_binary_install_dir directory exists
+- name: check if _node_exporter_binary_install_dir directory exists
   stat:
     path: "{{ _node_exporter_binary_install_dir }}"
   register: install_dir_check
 
-- name: Create node_exporter_binary_install_dir
+- name: Create _node_exporter_binary_install_dir
   file:
     path: "{{ _node_exporter_binary_install_dir }}"
     state: directory
@@ -70,6 +70,6 @@
     dest: "{{ _node_exporter_binary_install_dir }}/node_exporter"
     mode: 0755
     owner: root
-    group: wheel
+    group: "{{_ node_exporter_root_group }}"
   when: node_exporter_binary_local_dir | length > 0
   notify: restart node_exporter

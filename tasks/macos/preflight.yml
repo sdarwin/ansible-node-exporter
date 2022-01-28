@@ -1,4 +1,27 @@
 ---
+- name: Assert usage of systemd as an init system
+  assert:
+    that: ansible_service_mgr == 'systemd'
+    msg: "This role only works with systemd"
+  when:
+    - ansible_system == 'Linux'
+
+- name: Get systemd version
+  command: systemctl --version
+  changed_when: false
+  check_mode: false
+  register: __systemd_version
+  tags:
+    - skip_ansible_lint
+  when:
+    - ansible_system == 'Linux'
+
+- name: Set systemd version fact
+  set_fact:
+    node_exporter_systemd_version: "{{ __systemd_version.stdout_lines[0] | regex_replace('^systemd\\s(\\d+).*$', '\\1') }}"
+  when:
+    - ansible_system == 'Linux'
+
 - name: Naive assertion of proper listen address
   assert:
     that:
@@ -90,10 +113,5 @@
       with_items: "{{ _checksums }}"
       when:
         - ( "{{ ansible_system |lower }}" + "-" + go_arch + ".tar.gz") in item
-
-    - name: Check how delegate_to deals with system specific vars
-      ansible.builtin.debug:
-        var: ansible_system
-
   delegate_to: localhost
   when: node_exporter_binary_local_dir | length == 0

@@ -28,8 +28,8 @@ jobs:
 
       - name: Set up the test environment.
         run: |
-          cp tests/inventory ./hosts
-          # ansible-galaxy install -r requirements.yml
+          cp tests/test-inventory ./test-inventory
+          # ansible-galaxy install -r test-requirements.yml
 
       - name: Test the playbook's syntax.
         run: ansible-playbook molecule/default/playbook.yml --syntax-check

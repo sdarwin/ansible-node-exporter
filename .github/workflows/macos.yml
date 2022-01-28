@@ -5,6 +5,7 @@ name: macos ci
   push:
     branches:
       - master
+      - develop
       - feature/*
 
 jobs:
@@ -17,16 +18,16 @@ jobs:
           - macos-10.15
 
     steps:
-      - name: Check out the codebase.
+      - name: Check out the codebase
         uses: actions/checkout@v2
 
       - name: Check pip packages
         run: sudo pip3 list
 
-      - name: Install test dependencies.
+      - name: Install test dependencies
         run: sudo pip3 install ansible
 
-      - name: Set up the test environment.
+      - name: Set up the test environment
         run: |
           cp tests/test-inventory ./test-inventory
           cp tests/ansible.cfg ./ansible.cfg
@@ -34,13 +35,13 @@ jobs:
           mkdir -p /Users/runner/.ansible/roles
           ln -s $GITHUB_WORKSPACE /Users/runner/.ansible/roles/cloudalchemy.node_exporter
 
-      - name: Test the playbook's syntax.
+      - name: Test the playbook's syntax
         run: |
           ls -al /usr/local || true
           ls -al /usr/local/bin || true
           ansible-playbook molecule/default/playbook.yml --syntax-check
 
-      - name: Run the playbook.
+      - name: Run the playbook
         run: |
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
           ansible-playbook molecule/default/playbook.yml
@@ -50,11 +51,11 @@ jobs:
       - name: Test the results
         run: |
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-          py.test -v tests/tests_macos.py
+          ansible-playbook tests/tests_macos.yml
         env:
           ANSIBLE_FORCE_COLOR: '1'
 
-      - name: Idempotence check.
+      - name: Idempotence check
         run: |
           idempotence=$(mktemp)
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES

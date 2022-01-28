@@ -33,15 +33,11 @@ jobs:
           # ansible-galaxy install -r test-requirements.yml
           mkdir -p /Users/runner/.ansible/roles
           ln -s $GITHUB_WORKSPACE /Users/runner/.ansible/roles/cloudalchemy.node_exporter
-          pwd
-          ls -al
-          ls -al /Users/runner/.ansible/roles
-          ls -al /Users/runner/.ansible/roles/cloudalchemy.node_exporter
 
       - name: Test the playbook's syntax.
         run: |
-          ls -al /Users/runner/.ansible/roles
-          ls -al /Users/runner/.ansible/roles/cloudalchemy.node_exporter
+          ls -al /usr/local || true
+          ls -al /usr/local/bin || true
           ansible-playbook molecule/default/playbook.yml --syntax-check
 
       - name: Test the playbook.

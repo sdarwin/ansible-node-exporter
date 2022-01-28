@@ -26,20 +26,23 @@
   tags:
     - node_exporter_configure
 
-# - name: Ensure Node Exporter is enabled on boot
-#   become: true
-#   systemd:
-#     daemon_reload: true
-#     name: node_exporter
-#     enabled: true
-#     state: started
-#   when:
-#     - not ansible_check_mode
-#   tags:
-#     - node_exporter_run
+- name: Ensure Node Exporter is enabled on boot
+  become: true
+  systemd:
+    daemon_reload: true
+    name: node_exporter
+    enabled: true
+    state: started
+  when:
+    - not ansible_check_mode
+    - ansible_system == 'Linux'
+  tags:
+    - node_exporter_run
 
 - name: Ensure Node Exporter is started
   become: true
   command: |
     launchctl load /Library/LaunchDaemons/cloudalchemy.mxcl.node_exporter.plist
   changed_when: false
+  when:
+    - ansible_system == 'Darwin'

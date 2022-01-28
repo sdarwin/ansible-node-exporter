@@ -1,4 +1,15 @@
 ---
+- name: Copy the node_exporter systemd service file
+  template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart node_exporter
+  when:
+    - ansible_system == 'Linux'
+
 - name: Copy the node_exporter launchd service file
   template:
     src: cloudalchemy.mxcl.node_exporter.plist.j2
@@ -7,6 +18,8 @@
     group: "{{_node_exporter_root_group}}"
     mode: 0644
   notify: restart node_exporter
+  when:
+    - ansible_system == 'Darwin'
 
 - name: Copy the node_exporter startup script
   template:
@@ -16,6 +29,8 @@
     group: "{{_node_exporter_root_group}}"
     mode: 0775
   notify: restart node_exporter
+  when:
+    - ansible_system == 'Darwin'
 
 - block:
     - name: Create node_exporter config directory

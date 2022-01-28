@@ -1,5 +1,5 @@
 #!/bin/bash
-exec su {{ _node_exporter_system_user }} -c "{{ _node_exporter_binary_install_dir }}/node_exporter \
+exec su -m {{ _node_exporter_system_user }} -c "{{ _node_exporter_binary_install_dir }}/node_exporter \
 {% for collector in node_exporter_enabled_collectors -%}
 {% if not collector == 'systemd' %}
 {% if not collector is mapping %}

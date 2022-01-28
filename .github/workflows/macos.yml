@@ -8,8 +8,8 @@ name: MACOS CI
       - feature/*
 
 jobs:
-  integration:
-    name: Integration
+  macos:
+    name: macos
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

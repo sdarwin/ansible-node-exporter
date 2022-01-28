@@ -4,7 +4,7 @@
     src: cloudalchemy.mxcl.node_exporter.plist.j2
     dest: /Library/LaunchDaemons/cloudalchemy.mxcl.node_exporter.plist
     owner: root
-    group: wheel
+    group: "{{_node_exporter_root_group}}"
     mode: 0644
   notify: restart node_exporter
 
@@ -13,6 +13,7 @@
     src: node_exporter_cloudalchemy_services.j2
     dest: "{{ _node_exporter_binary_install_dir }}/node_exporter_cloudalchemy_services"
     owner: root
+    group: "{{_node_exporter_root_group}}"
     mode: 0775
   notify: restart node_exporter
 
@@ -22,7 +23,7 @@
         path: "/etc/node_exporter"
         state: directory
         owner: root
-        group: wheel
+        group: "{{_node_exporter_root_group}}"
         mode: u+rwX,g+rwX,o=rX
 
     - name: Copy the node_exporter config file
@@ -30,7 +31,7 @@
         src: config.yaml.j2
         dest: /etc/node_exporter/config.yaml
         owner: root
-        group: wheel
+        group: "{{_node_exporter_root_group}}"
         mode: 0644
       notify: restart node_exporter
   when:

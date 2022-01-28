@@ -17,12 +17,26 @@
     home: /
   when: _node_exporter_system_user != "root"
 
+- name: check if _node_exporter_binary_install_dir directory exists
+  stat:
+    path: "{{ _node_exporter_binary_install_dir }}"
+  register: install_dir_check
+
+- name: Create _node_exporter_binary_install_dir
+  file:
+    path: "{{ _node_exporter_binary_install_dir }}"
+    state: directory
+    owner: root
+    group: "{{_node_exporter_root_group}}"
+    mode: u+rwX,g+rwX,o=rX
+  when: not install_dir_check.stat.exists
+
 - block:
     - name: Download node_exporter binary to local folder
       become: false
       get_url:
-        url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
-        dest: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+        url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.{{ ansible_system |lower }}-{{ go_arch }}.tar.gz"
+        dest: "/tmp/node_exporter-{{ node_exporter_version }}.{{ ansible_system |lower }}-{{ go_arch }}.tar.gz"
         checksum: "sha256:{{ node_exporter_checksum }}"
         mode: '0644'
       register: _download_binary
@@ -35,19 +49,18 @@
     - name: Unpack node_exporter binary
       become: false
       unarchive:
-        src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+        src: "/tmp/node_exporter-{{ node_exporter_version }}.{{ ansible_system | lower }}-{{ go_arch }}.tar.gz"
         dest: "/tmp"
-        creates: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}/node_exporter"
+        creates: "/tmp/node_exporter-{{ node_exporter_version }}.{{ ansible_system | lower }}-{{ go_arch }}/node_exporter"
       delegate_to: localhost
       check_mode: false
 
     - name: Propagate node_exporter binaries
       copy:
-        src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}/node_exporter"
+        src: "/tmp/node_exporter-{{ node_exporter_version }}.{{ ansible_system | lower }}-{{ go_arch }}/node_exporter"
         dest: "{{ _node_exporter_binary_install_dir }}/node_exporter"
         mode: 0755
         owner: root
-        group: root
       notify: restart node_exporter
       when: not ansible_check_mode
   when: node_exporter_binary_local_dir | length == 0
@@ -58,6 +71,6 @@
     dest: "{{ _node_exporter_binary_install_dir }}/node_exporter"
     mode: 0755
     owner: root
-    group: root
+    group: "{{_ node_exporter_root_group }}"
   when: node_exporter_binary_local_dir | length > 0
   notify: restart node_exporter

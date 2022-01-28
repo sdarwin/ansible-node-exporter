@@ -1,9 +1,7 @@
 import os
 import testinfra.utils.ansible_runner
 
-testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
-    os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
-
+# testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner().get_hosts('all') 
 
 def test_directories(host):
     dirs = [
@@ -46,13 +44,6 @@ def test_user(host):
     assert host.user("node-exp").shell == "/usr/sbin/nologin"
     assert host.user("node-exp").home == "/"
 
-
-def test_service(host):
-    s = host.service("node_exporter")
-#    assert s.is_enabled
-    assert s.is_running
-
-
 def test_socket(host):
     sockets = [
         "tcp://127.0.0.1:9100"
@@ -60,3 +51,10 @@ def test_socket(host):
     for socket in sockets:
         s = host.socket(socket)
         assert s.is_listening
+
+
+def test_service(host):
+    s = host.service("node_exporter")
+#    assert s.is_enabled
+    assert s.is_running
+

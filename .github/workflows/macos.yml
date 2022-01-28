@@ -30,6 +30,7 @@ jobs:
         run: |
           cp tests/test-inventory ./test-inventory
           # ansible-galaxy install -r test-requirements.yml
+          ln -s . /Users/runner/.ansible/roles/cloudalchemy.node_exporter
 
       - name: Test the playbook's syntax.
         run: ansible-playbook molecule/default/playbook.yml --syntax-check

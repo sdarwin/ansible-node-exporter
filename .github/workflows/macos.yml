@@ -50,7 +50,7 @@ jobs:
       - name: Test the results
         run: |
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-          testinfra tests/tests_macos.py
+          py.test -v tests/tests_macos.py
         env:
           ANSIBLE_FORCE_COLOR: '1'
 

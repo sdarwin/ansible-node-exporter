@@ -31,17 +31,17 @@ jobs:
           cp tests/test-inventory ./test-inventory
           cp tests/ansible.cfg ./ansible.cfg
           # ansible-galaxy install -r test-requirements.yml
-          mkdir -p /Users/runner/.ansible/role
-          ln -s $GITHUB_WORKSPACE /Users/runner/.ansible/role/cloudalchemy.node_exporter
+          mkdir -p /Users/runner/.ansible/roles
+          ln -s $GITHUB_WORKSPACE /Users/runner/.ansible/roles/cloudalchemy.node_exporter
           pwd
           ls -al
-          ls -al /Users/runner/.ansible/role
-          ls -al /Users/runner/.ansible/role/cloudalchemy.node_exporter
+          ls -al /Users/runner/.ansible/roles
+          ls -al /Users/runner/.ansible/roles/cloudalchemy.node_exporter
 
       - name: Test the playbook's syntax.
         run: |
-          ls -al /Users/runner/.ansible/role
-          ls -al /Users/runner/.ansible/role/cloudalchemy.node_exporter
+          ls -al /Users/runner/.ansible/roles
+          ls -al /Users/runner/.ansible/roles/cloudalchemy.node_exporter
           ansible-playbook molecule/default/playbook.yml --syntax-check
 
       - name: Test the playbook.

@@ -13,6 +13,7 @@ jobs:
     name: macos
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os:
           - macos-10.15
@@ -20,6 +21,11 @@ jobs:
           - latest
           - default
           - alternative
+        ansible_version:
+          - "2.9"
+          - "2.10"
+          - "4.10"
+          - "5.1"
 
     steps:
       - name: Check out the codebase
@@ -29,7 +35,7 @@ jobs:
         run: sudo pip3 list
 
       - name: Install test dependencies
-        run: sudo pip3 install ansible
+        run: sudo pip3 install "ansible~=${{ matrix.ansible_version }}.0"
 
       - name: Set up the test environment
         run: |

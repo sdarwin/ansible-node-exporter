@@ -57,13 +57,31 @@
           - "{{ __node_exporter_key_file.stat.exists }}"
   when: node_exporter_tls_server_config | length > 0
 
-- name: Check if node_exporter is installed
-  stat:
-    path: "{{ _node_exporter_binary_install_dir }}/node_exporter"
+- name: Check if node_exporter is installed - Windows
+  ansible.windows.win_stat:
+    # Put this back. Only temporarily testing something.
+    # path: "{{ _node_exporter_binary_install_dir }}/node_exporter"
+    path: "C:\\Temp\\file.txt"
   register: __node_exporter_is_installed
   check_mode: false
   tags:
     - node_exporter_install
+  when:
+    - ansible_system == "Win32NT"
+
+# - name: Check if node_exporter is installed - Linux
+#   stat:
+#     path: "{{ _node_exporter_binary_install_dir }}/node_exporter"
+#   register: __node_exporter_is_installed
+#   check_mode: false
+#   tags:
+#     - node_exporter_install
+#   when:
+#     - ansible_system != "Win32NT"
+
+- name: DEBUGG
+  debug:
+    var: __node_exporter_is_installed
 
 - name: Gather currently installed node_exporter version (if any)
   command: "{{ _node_exporter_binary_install_dir }}/node_exporter --version"
@@ -77,10 +95,26 @@
     - node_exporter_install
     - skip_ansible_lint
 
+- name: "Set installer variables - Windows"
+  set_fact:
+    node_exporter_latest_release_api: "https://api.github.com/repos/prometheus-community/windows_exporter/releases/latest"
+    # node_exporter_releases_url: "https://github.com/prometheus-community/windows_exporter/releases"
+    # node_exporter_installer_name: "windows_exporter"
+    # node_exporter_installer_suffix: ".msi"
+  when: ansible_system == "Win32NT"
+
+- name: "Set installer variables - Linux, other"
+  set_fact:
+    node_exporter_latest_release_api: "https://api.github.com/repos/prometheus/node_exporter/releases/latest"
+    # node_exporter_releases_url: "https://github.com/prometheus/node_exporter/releases"
+    # node_exporter_installer_name: "node_exporter"
+    # node_exporter_installer_suffix: ".tar.gz"
+  when: ansible_system != "Win32NT"
+
 - block:
     - name: Get latest release
       uri:
-        url: "https://api.github.com/repos/prometheus/node_exporter/releases/latest"
+        url: "{{ node_exporter_latest_release_api }}"
         method: GET
         return_content: true
         status_code: 200
@@ -104,14 +138,26 @@
 - block:
     - name: Get checksum list from github
       set_fact:
-        _checksums: "{{ lookup('url', 'https://github.com/prometheus/node_exporter/releases/download/v' + node_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
+        _checksums: "{{ lookup('url', 'https://github.com/prometheus/node_exporter/releases' + '/download/v' + node_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
       run_once: true
 
-    - name: "Get checksum for {{ go_arch }} architecture"
+    - name: Get checksum list from github - windows
+      set_fact:
+        _checksums_windows: "{{ lookup('url', 'https://github.com/prometheus-community/windows_exporter/releases' + '/download/v' + node_exporter_version_windows + '/sha256sums.txt', wantlist=True) | list }}"
+      run_once: true
+
+    - name: "Get checksum for {{ go_arch }} architecture - Linux"
       set_fact:
         node_exporter_checksum: "{{ item.split(' ')[0] }}"
       with_items: "{{ _checksums }}"
       when:
-        - ( "{{ ansible_system |lower }}" + "-" + go_arch + ".tar.gz") in item
+        - ( "{{ ansible_system |lower }}" + "-" + go_arch + '.tar.gz') in item
+
+    - name: "Get checksum for {{ go_arch }} architecture - Windows"
+      set_fact:
+        node_exporter_checksum_windows: "{{ item.split(' ')[0] }}"
+      with_items: "{{ _checksums_windows }}"
+      when:
+        - ( "-" + go_arch + '.msi') in item
   delegate_to: localhost
   when: node_exporter_binary_local_dir | length == 0

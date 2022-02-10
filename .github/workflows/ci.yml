@@ -16,6 +16,10 @@ jobs:
       matrix:
         os:
           - macos-10.15
+        scenario:
+          - latest
+          - default
+          - alternative
 
     steps:
       - name: Check out the codebase
@@ -37,12 +41,12 @@ jobs:
 
       - name: Test the playbook's syntax
         run: |
-          ansible-playbook molecule/default/playbook.yml --syntax-check
+          ansible-playbook molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
 
       - name: Run the playbook
         run: |
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-          ansible-playbook molecule/default/playbook.yml
+          ansible-playbook molecule/${{ matrix.scenario }}/playbook.yml
         env:
           ANSIBLE_FORCE_COLOR: '1'
 
@@ -57,7 +61,7 @@ jobs:
         run: |
           idempotence=$(mktemp)
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-          ansible-playbook molecule/default/playbook.yml | tee -a ${idempotence}
+          ansible-playbook molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
           tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
         env:
           ANSIBLE_FORCE_COLOR: '1'

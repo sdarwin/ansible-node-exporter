@@ -27,7 +27,7 @@
     dest: "{{ _node_exporter_binary_install_dir }}/node_exporter_cloudalchemy_services"
     owner: root
     group: "{{ _node_exporter_root_group }}"
-    mode: 0775
+    mode: 0755
   notify: restart node_exporter
   when:
     - ansible_system == 'Darwin'

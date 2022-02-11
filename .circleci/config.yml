@@ -42,18 +42,18 @@ jobs:
               echo 'Not running latest on PR'
             else
               # molecule test -s '<< parameters.scenario >>' --destroy always
-              - run: molecule -s '<< parameters.scenario >>' --debug dependency
-              - run: molecule -s '<< parameters.scenario >>' --debug lint
-              - run: molecule -s '<< parameters.scenario >>' --debug cleanup
-              - run: molecule -s '<< parameters.scenario >>' --debug destroy
-              - run: molecule -s '<< parameters.scenario >>' --debug syntax
-              - run: molecule -s '<< parameters.scenario >>' --debug create
-              - run: molecule -s '<< parameters.scenario >>' --debug prepare
-              - run: molecule -s '<< parameters.scenario >>' --debug converge
-              - run: molecule -s '<< parameters.scenario >>' --debug idempotence
-              - run: molecule -s '<< parameters.scenario >>' --debug verify
-              - run: molecule -s '<< parameters.scenario >>' --debug cleanup
-              - run: molecule -s '<< parameters.scenario >>' --debug destroy
+              molecule -s '<< parameters.scenario >>' --debug dependency
+              molecule -s '<< parameters.scenario >>' --debug lint
+              molecule -s '<< parameters.scenario >>' --debug cleanup
+              molecule -s '<< parameters.scenario >>' --debug destroy
+              molecule -s '<< parameters.scenario >>' --debug syntax
+              molecule -s '<< parameters.scenario >>' --debug create
+              molecule -s '<< parameters.scenario >>' --debug prepare
+              molecule -s '<< parameters.scenario >>' --debug converge
+              molecule -s '<< parameters.scenario >>' --debug idempotence
+              molecule -s '<< parameters.scenario >>' --debug verify
+              molecule -s '<< parameters.scenario >>' --debug cleanup
+              molecule -s '<< parameters.scenario >>' --debug destroy
 
             fi
   release:

@@ -2,5 +2,13 @@
 - name: Test macos
   hosts: localhost
   tasks:
+  - name: check process
+    shell: ps -ef | grep node || true
+    changed_when: false
+    failed_when: false
+  - name: check ports
+    shell: netstat -anvp tcp | awk 'NR<3 || /LISTEN/'
+    changed_when: false
+    failed_when: false
   - name: check if node_exporter is running on port 8080
     command: curl -sf http://localhost:8080

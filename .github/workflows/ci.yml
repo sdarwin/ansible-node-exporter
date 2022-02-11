@@ -52,12 +52,12 @@ jobs:
       - name: Run the prepare playbook
         run: |
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-          ansible-playbook molecule/${{ matrix.scenario }}/prepare.yml
+          ansible-playbook -vvv molecule/${{ matrix.scenario }}/prepare.yml
 
       - name: Run the playbook
         run: |
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-          ansible-playbook molecule/${{ matrix.scenario }}/playbook.yml
+          ansible-playbook -vvv molecule/${{ matrix.scenario }}/playbook.yml
         env:
           ANSIBLE_FORCE_COLOR: '1'
 

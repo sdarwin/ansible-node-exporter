@@ -65,7 +65,7 @@ jobs:
       - name: Test the results
         run: |
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-          ansible-playbook tests/tests_macos.yml
+          ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/tests_macos.yml
         env:
           ANSIBLE_FORCE_COLOR: '1'
 

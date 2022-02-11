@@ -49,6 +49,11 @@ jobs:
         run: |
           ansible-playbook molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
 
+      - name: Run the prepare playbook
+        run: |
+          export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+          ansible-playbook molecule/${{ matrix.scenario }}/prepare.yml
+
       - name: Run the playbook
         run: |
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES

@@ -5,8 +5,6 @@
   roles:
     - cloudalchemy.node_exporter
   pre_tasks:
-    - name: collect facts
-      setup:
     - name: Display whoami
       command: whoami
       changed_when: false

@@ -2,17 +2,17 @@
 - name: Test macos
   hosts: localhost
   tasks:
-    - name: check process
-      shell: ps -ef | grep node || true
-      register: out
-      changed_when: false
-      failed_when: false
-    - debug: var=out.stdout_lines
-    - name: check ports
-      shell: netstat -anvp tcp | awk 'NR<3 || /LISTEN/'
-      register: out
-      changed_when: false
-      failed_when: false
-    - debug: var=out.stdout_lines
-    - name: check if node_exporter is running on port 8080
-      command: curl -sf http://localhost:8080
+    # - name: check processes
+    #   shell: ps -ef | grep node || true
+    #   register: out
+    #   changed_when: false
+    #   failed_when: false
+    # - debug: var=out.stdout_lines
+    # - name: check ports
+    #   shell: netstat -anvp tcp | awk 'NR<3 || /LISTEN/'
+    #   register: out
+    #   changed_when: false
+    #   failed_when: false
+    # - debug: var=out.stdout_lines
+    - name: check if node_exporter is listening on port 8080
+      command: curl --silent --output /dev/null -k -u randomuser:examplepassword https://localhost:8080/metrics

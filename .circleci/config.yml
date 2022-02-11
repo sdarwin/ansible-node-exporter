@@ -41,7 +41,20 @@ jobs:
             if [[ -n "${CIRCLE_PULL_REQUEST}" ]] && [[ '<< parameters.scenario >>' == 'latest' ]]; then
               echo 'Not running latest on PR'
             else
-              molecule test -s '<< parameters.scenario >>' --destroy always
+              # molecule test -s '<< parameters.scenario >>' --destroy always
+              - run: molecule -s '<< parameters.scenario >>' --debug dependency
+              - run: molecule -s '<< parameters.scenario >>' --debug lint
+              - run: molecule -s '<< parameters.scenario >>' --debug cleanup
+              - run: molecule -s '<< parameters.scenario >>' --debug destroy
+              - run: molecule -s '<< parameters.scenario >>' --debug syntax
+              - run: molecule -s '<< parameters.scenario >>' --debug create
+              - run: molecule -s '<< parameters.scenario >>' --debug prepare
+              - run: molecule -s '<< parameters.scenario >>' --debug converge
+              - run: molecule -s '<< parameters.scenario >>' --debug idempotence
+              - run: molecule -s '<< parameters.scenario >>' --debug verify
+              - run: molecule -s '<< parameters.scenario >>' --debug cleanup
+              - run: molecule -s '<< parameters.scenario >>' --debug destroy
+
             fi
   release:
     executor: publisher
@@ -71,14 +84,14 @@ workflows:
           matrix:
             parameters:
               ansible:
-                - "2.9"
-                - "2.10"
+                # - "2.9"
+                # - "2.10"
                 - "4.10"
-                - "5.1"
+                # - "5.1"
               scenario:
-                - default
+                # - default
                 - alternative
-                - latest
+                # - latest
           filters:
             tags:
               only: /.*/

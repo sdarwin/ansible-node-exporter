@@ -15,8 +15,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - macos-10.15
+        include: 
+          - os: macos-10.15
+            ansible_python_interpreter: /usr/local/bin/python3
         scenario:
           - latest
           - default
@@ -47,17 +48,17 @@ jobs:
 
       - name: Test the playbook's syntax
         run: |
-          ansible-playbook molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
+          ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}"  molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
 
       - name: Run the prepare playbook
         run: |
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-          ansible-playbook -vvv molecule/${{ matrix.scenario }}/prepare.yml
+          ansible-playbook -vvv -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
 
       - name: Run the playbook
         run: |
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-          ansible-playbook -vvv molecule/${{ matrix.scenario }}/playbook.yml
+          ansible-playbook -vvv -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
         env:
           ANSIBLE_FORCE_COLOR: '1'
 

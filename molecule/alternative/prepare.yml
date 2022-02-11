@@ -8,6 +8,10 @@
   tasks:
     # - name: collect facts
     #   setup:
+    - name: Check python version
+      shell: |
+        which python3 || true
+        ls -al /usr/local/bin/py* || true
     - name: Download node_exporter binary to local folder
       become: false
       get_url:

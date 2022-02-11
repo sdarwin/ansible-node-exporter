@@ -12,6 +12,7 @@
       shell: |
         which python3 || true
         ls -al /usr/local/bin/py* || true
+      changed_when: false
     - name: Download node_exporter binary to local folder
       become: false
       get_url:

@@ -7,6 +7,7 @@
   pre_tasks:
     - name: Display whoami
       command: whoami
+      changed_when: false
     - name: Create node_exporter cert dir
       file:
         path: "{{ node_exporter_tls_server_config.cert_file | dirname }}"

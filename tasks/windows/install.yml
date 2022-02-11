@@ -109,7 +109,7 @@
       win_package:
         path: "C:\\tmp\\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi"
         state: present
-        #arguments: /install /passive /norestart
+        # arguments: /install /passive /norestart
       when:
         - not ansible_check_mode
         - ansible_system == "Win32NT"

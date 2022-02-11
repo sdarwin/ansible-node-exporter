@@ -1,0 +1,6 @@
+---
+- name: Test macos
+  hosts: localhost
+  tasks:
+  - name: check if node_exporter is running on port 8080
+    command: curl -sf http://localhost:8080

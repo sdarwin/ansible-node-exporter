@@ -48,7 +48,7 @@ jobs:
 
       - name: Test the playbook's syntax
         run: |
-          ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}"  molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
+          ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
 
       - name: Run the prepare playbook
         run: |
@@ -65,7 +65,7 @@ jobs:
       - name: Test the results
         run: |
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-          ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/tests_macos.yml
+          ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/tests_macos_${{ matrix.scenario }}.yml
         env:
           ANSIBLE_FORCE_COLOR: '1'
 
@@ -73,7 +73,7 @@ jobs:
         run: |
           idempotence=$(mktemp)
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-          ansible-playbook molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
+          ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
           tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
         env:
           ANSIBLE_FORCE_COLOR: '1'

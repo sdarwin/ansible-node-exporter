@@ -15,7 +15,6 @@
         path: "{{ node_exporter_tls_server_config.cert_file | dirname }}"
         state: directory
         owner: root
-        group: root
       become: true
     - name: Copy cert and key
       copy:

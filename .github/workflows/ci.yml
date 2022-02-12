@@ -1,5 +1,5 @@
 ---
-name: macos ci
+name: ci
 'on':
   pull_request:
   push:
@@ -18,6 +18,8 @@ jobs:
         include: 
           - os: macos-10.15
             ansible_python_interpreter: /usr/local/bin/python3
+          - os: ubuntu-20.04
+            ansible_python_interpreter: /usr/bin/python3
         scenario:
           - latest
           - default
@@ -32,10 +34,7 @@ jobs:
       - name: Check out the codebase
         uses: actions/checkout@v2
 
-      - name: Check pip packages
-        run: sudo pip3 list
-
-      - name: Install test dependencies
+      - name: Install ansible
         run: sudo pip3 install "ansible~=${{ matrix.ansible_version }}.0"
 
       - name: Set up the test environment
@@ -55,10 +54,10 @@ jobs:
             ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
 
             echo "Run the prepare playbook"
-            ansible-playbook -vvv -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
+            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
 
             echo "Run the main playbook"
-            ansible-playbook -vvv -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
+            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
 
             echo "Test the results"
             ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/tests_macos_${{ matrix.scenario }}.yml

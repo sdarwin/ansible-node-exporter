@@ -70,4 +70,4 @@ jobs:
           fi
         env:
           ANSIBLE_FORCE_COLOR: '1'
-          OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
+          OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES"

@@ -46,10 +46,10 @@ jobs:
           mkdir -p /Users/runner/.ansible/roles
           ln -s $GITHUB_WORKSPACE /Users/runner/.ansible/roles/cloudalchemy.node_exporter
 
-      - name: Run playbook tests
+      - name: playbook tests
         run: |
           if [[ -n "${{ github.event.pull_request.number }}" ]] && [[ "${{ matrix.scenario }}" == 'latest' ]]; then
-            echo "Not testing 'latest' and 'pull request'
+            echo "Not testing 'latest' and 'pull request'"
           else
             echo "Test the playbook's syntax"
             ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check

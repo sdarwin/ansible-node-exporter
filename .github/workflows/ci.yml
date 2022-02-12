@@ -16,8 +16,8 @@ jobs:
       fail-fast: false
       matrix:
         include: 
-          - { "os": "ubuntu-20.04", "ansible_python_interpreter": "/usr/bin/python3" }
-          - { "os": "macos-10.15", "ansible_python_interpreter": "/usr/local/bin/python3" }
+          - os: macos-10.15
+            ansible_python_interpreter: /usr/local/bin/python3
         scenario:
           - latest
           - default

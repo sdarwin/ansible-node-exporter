@@ -31,6 +31,7 @@
     node_exporter_enabled_collectors:
       # - meminfo
       - boottime
+      - netdev
     node_exporter_disabled_collectors:
       - diskstats
 

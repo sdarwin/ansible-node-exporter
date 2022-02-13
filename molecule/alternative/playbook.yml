@@ -30,7 +30,7 @@
     node_exporter_textfile_dir: ""
     node_exporter_enabled_collectors:
       # - meminfo
-      - entropy
+      - boottime
     node_exporter_disabled_collectors:
       - diskstats
 

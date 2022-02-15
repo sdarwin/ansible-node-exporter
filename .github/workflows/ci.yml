@@ -186,6 +186,7 @@ jobs:
       - name: playbook tests
         shell: wsl-bash {0}
         run: |
+          set -xe
           if [[ -n "${{ github.event.pull_request.number }}" ]] && [[ "${{ matrix.scenario }}" == 'latest' ]]; then
             echo "Not testing 'latest' and 'pull request'"
           else

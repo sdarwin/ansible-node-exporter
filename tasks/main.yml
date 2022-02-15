@@ -1,4 +1,16 @@
 ---
+- name: print system
+  debug:
+    var: ansible_system
+
+- name: print distribution
+  debug:
+    var: ansible_distribution
+
+- name: print family
+  debug:
+    var: ansible_os_family
+
 - name: include linux tasks
   include_tasks: main-linux.yml
   when: ansible_system == 'Linux' or ansible_distribution == 'MacOSX'

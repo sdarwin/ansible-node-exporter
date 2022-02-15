@@ -1,7 +1,7 @@
 ---
 - name: include linux tasks
   include_tasks: main-linux.yml
-  when: ansible_system == 'Linux' or ansible_system == 'Darwin'
+  when: ansible_system == 'Linux' or ansible_distribution == 'MacOSX'
 
 - name: include windows tasks
   include_tasks: windows/main.yml

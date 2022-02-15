@@ -5,6 +5,13 @@
     - node_exporter_configure
     - node_exporter_run
 
+- import_tasks: configure_windows.yml
+  become: true
+  when:
+    - ansible_system == 'Win32NT'
+  tags:
+    - node_exporter_configure
+
 - import_tasks: install.yml
   become: true
   when:
@@ -23,10 +30,12 @@
   tags:
     - node_exporter_configure
 
-# - import_tasks: configure.yml
-#   become: true
-#   tags:
-#     - node_exporter_configure
+- import_tasks: configure.yml
+  become: true
+  when:
+    - ansible_system != 'Win32NT'
+  tags:
+    - node_exporter_configure
 #
 # - name: Ensure Node Exporter is enabled on boot
 #   become: true
@@ -47,4 +56,4 @@
 #     launchctl load /Library/LaunchDaemons/cloudalchemy.mxcl.node_exporter.plist
 #   changed_when: false
 #   when:
-#     - ansible_system == 'Darwin'
+#     - ansible_distribution == 'MacOSX'

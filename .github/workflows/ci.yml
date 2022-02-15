@@ -174,13 +174,13 @@ jobs:
       - name: Set up the test environment
         shell: wsl-bash {0}
         run: |
+          set -xe
           cp tests/test-inventory ./test-inventory
           cp tests/ansible.cfg ./ansible.cfg
           pip3 install -r test-requirements.txt
-          mkdir $HOME/.ansible/roles
-          ln -s /mnt/d/a/ansible-node-exporter/ansible-node-exporter $HOME/.ansible/roles/cloudalchemy.node_exporter
-          echo "hello"
-          echo "testing"
+          mkdir -p $HOME/.ansible/roles
+          ln -s . $HOME/.ansible/roles/cloudalchemy.node_exporter
+          ls -al $HOME/.ansible/roles/cloudalchemy.node_exporter
 
       - name: playbook tests
         shell: wsl-bash {0}

@@ -173,7 +173,10 @@ jobs:
         shell: wsl-bash {0}
         run: |
           set -xe
-          cp tests/test-inventory ./hosts
+          mkdir /etc/ansible
+          chmod 755 /etc/ansible
+          cp tests/test-inventory /etc/ansible/hosts
+          ls -al /etc/ansible
           # cp tests/ansible.cfg ./ansible.cfg
           mkdir /tmp/ansibletest
           cp tests/ansible.cfg /tmp/ansibletest/ansible.cfg

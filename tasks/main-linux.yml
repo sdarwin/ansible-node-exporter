@@ -1,4 +1,8 @@
 ---
+- name: DEBUGG
+  debug:
+    msg: "Linux tasks"
+
 - import_tasks: preflight.yml
   tags:
     - node_exporter_install

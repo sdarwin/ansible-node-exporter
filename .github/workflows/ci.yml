@@ -177,12 +177,7 @@ jobs:
           chmod 755 /etc/ansible
           cp tests/test-inventory /etc/ansible/hosts
           ls -al /etc/ansible
-          # cp tests/ansible.cfg ./ansible.cfg
-          mkdir /tmp/ansibletest
-          cp tests/ansible.cfg /tmp/ansibletest/ansible.cfg
-          chmod -R 700 /tmp/ansibletest
-          ls -al /tmp
-          ls -al /tmp/ansibletest
+          cp tests/ansible.cfg.windows /etc/ansible/ansible.cfg
           pip3 install -r test-requirements.txt
           mkdir -p $HOME/.ansible/roles
           ln -s . $HOME/.ansible/roles/cloudalchemy.node_exporter
@@ -214,4 +209,4 @@ jobs:
         env:
           ANSIBLE_FORCE_COLOR: '1'
           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
-          ANSIBLE_CONFIG: '/tmp/ansibletest/ansible.cfg'
+          ANSIBLE_CONFIG: '/etc/ansible/ansible.cfg'

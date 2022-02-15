@@ -1,4 +1,10 @@
 ---
+- name: Set fact - node_exporter_version
+  set_fact:
+    node_exporter_version: "{{ node_exporter_version_windows }}"
+  when:
+    - ansible_system == 'Win32NT'
+
 - name: Assert usage of systemd as an init system
   assert:
     that: ansible_service_mgr == 'systemd'
@@ -59,29 +65,42 @@
 
 - name: Check if node_exporter is installed - Windows
   ansible.windows.win_stat:
-    # Put this back. Only temporarily testing something.
-    # path: "{{ _node_exporter_binary_install_dir }}/node_exporter"
-    path: "C:\\Temp\\file.txt"
-  register: __node_exporter_is_installed
+    path: '{{ _node_exporter_binary_install_dir_windows }}\windows_exporter.exe'
+  register: __node_exporter_is_installed_windows
   check_mode: false
   tags:
     - node_exporter_install
   when:
     - ansible_system == 'Win32NT'
 
-# - name: Check if node_exporter is installed - Linux
-#   stat:
-#     path: "{{ _node_exporter_binary_install_dir }}/node_exporter"
-#   register: __node_exporter_is_installed
-#   check_mode: false
-#   tags:
-#     - node_exporter_install
-#   when:
-#     - ansible_system != 'Win32NT'
+- name: Check if node_exporter is installed - Linux
+  stat:
+    path: "{{ _node_exporter_binary_install_dir }}/node_exporter"
+  register: __node_exporter_is_installed
+  check_mode: false
+  tags:
+    - node_exporter_install
+  when:
+    - ansible_system != 'Win32NT'
 
-- name: DEBUGG
-  debug:
-    var: __node_exporter_is_installed
+- name: Set fact __node_exporter_is_installed
+  set_fact:
+    __node_exporter_is_installed: "{{ __node_exporter_is_installed_windows }}"
+  when: ansible_system == 'Win32NT'
+
+- name: Gather currently installed node_exporter version (if any) - Windows
+  ansible.windows.win_command: '"{{ _node_exporter_binary_install_dir_windows }}\windows_exporter.exe" --version'
+  args:
+    warn: false
+  changed_when: false
+  register: __node_exporter_current_version_output_windows
+  check_mode: false
+  when:
+    - ansible_system == 'Win32NT'
+    - __node_exporter_is_installed.stat.exists
+  tags:
+    - node_exporter_install
+    - skip_ansible_lint
 
 - name: Gather currently installed node_exporter version (if any)
   command: "{{ _node_exporter_binary_install_dir }}/node_exporter --version"
@@ -90,10 +109,17 @@
   changed_when: false
   register: __node_exporter_current_version_output
   check_mode: false
-  when: __node_exporter_is_installed.stat.exists
+  when:
+    - ansible_system != 'Win32NT'
+    - __node_exporter_is_installed.stat.exists
   tags:
     - node_exporter_install
     - skip_ansible_lint
+
+- name: Set fact __node_exporter_current_version_output
+  set_fact:
+    __node_exporter_current_version_output: "{{ __node_exporter_current_version_output_windows }}"
+  when: ansible_system == 'Win32NT'
 
 - name: "Set installer variables - Windows"
   set_fact:

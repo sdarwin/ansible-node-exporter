@@ -76,7 +76,8 @@ jobs:
       matrix:
         include: 
           - os: windows-2019
-            ansible_python_interpreter: C:\Python310\python.exe
+            # ansible_python_interpreter: C:\Python310\python.exe
+            ansible_python_interpreter: /usr/bin/python3
         scenario:
           - latest
           - default
@@ -172,7 +173,7 @@ jobs:
         shell: wsl-bash {0}
         run: |
           set -xe
-          cp tests/test-inventory ./test-inventory
+          cp tests/test-inventory ./hosts
           # cp tests/ansible.cfg ./ansible.cfg
           mkdir /tmp/ansibletest
           cp tests/ansible.cfg /tmp/ansibletest/ansible.cfg

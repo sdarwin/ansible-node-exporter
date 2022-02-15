@@ -108,7 +108,7 @@ jobs:
         with:
           distribution: Ubuntu-20.04
           additional-packages:
-            - python3-pip
+            python3-pip
 
       - shell: wsl-bash {0}
         run: |

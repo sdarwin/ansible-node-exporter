@@ -45,4 +45,4 @@
     launchctl load /Library/LaunchDaemons/cloudalchemy.mxcl.node_exporter.plist
   changed_when: false
   when:
-    - ansible_system == 'Darwin'
+    - ansible_distribution == 'MacOSX'

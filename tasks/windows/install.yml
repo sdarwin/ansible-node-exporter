@@ -46,7 +46,7 @@
       delegate_to: localhost
       check_mode: false
       when:
-        - ansible_system == "Win32NT"
+        - ansible_system == 'Win32NT'
 
     - name: Download node_exporter binary to local folder - Linux
       become: false
@@ -62,7 +62,7 @@
       delegate_to: localhost
       check_mode: false
       when:
-        - ansible_system != "Win32NT"
+        - ansible_system != 'Win32NT'
 
     - name: Unpack node_exporter binary
       become: false
@@ -73,7 +73,7 @@
       delegate_to: localhost
       check_mode: false
       when:
-        - ansible_system != "Win32NT"
+        - ansible_system != 'Win32NT'
 
     - name: Make tmp dir - Windows
       ansible.windows.win_file:
@@ -81,7 +81,7 @@
         state: directory
       when:
         - not ansible_check_mode
-        - ansible_system == "Win32NT"
+        - ansible_system == 'Win32NT'
 
     - name: Propagate node_exporter binaries - Windows
       copy:
@@ -92,7 +92,7 @@
       notify: restart node_exporter
       when:
         - not ansible_check_mode
-        - ansible_system == "Win32NT"
+        - ansible_system == 'Win32NT'
 
     - name: Propagate node_exporter binaries
       copy:
@@ -103,16 +103,17 @@
       notify: restart node_exporter
       when:
         - not ansible_check_mode
-        - ansible_system != "Win32NT"
+        - ansible_system != 'Win32NT'
 
     - name: install Windows exporter
       win_package:
-        path: "C:\\tmp\\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi"
+        # path: "C:\\tmp\\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi"
+        path: 'C:\\tmp\\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi'
+        arguments: 'EXTRA_FLAGS="--config.file ""C:\Program Files\windows_exporter\config.yaml"""'
         state: present
-        # arguments: /install /passive /norestart
       when:
         - not ansible_check_mode
-        - ansible_system == "Win32NT"
+        - ansible_system == 'Win32NT'
 
   when:
     - node_exporter_binary_local_dir | length == 0

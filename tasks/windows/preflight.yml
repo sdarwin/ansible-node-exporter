@@ -67,7 +67,7 @@
   tags:
     - node_exporter_install
   when:
-    - ansible_system == "Win32NT"
+    - ansible_system == 'Win32NT'
 
 # - name: Check if node_exporter is installed - Linux
 #   stat:
@@ -77,7 +77,7 @@
 #   tags:
 #     - node_exporter_install
 #   when:
-#     - ansible_system != "Win32NT"
+#     - ansible_system != 'Win32NT'
 
 - name: DEBUGG
   debug:
@@ -101,7 +101,7 @@
     # node_exporter_releases_url: "https://github.com/prometheus-community/windows_exporter/releases"
     # node_exporter_installer_name: "windows_exporter"
     # node_exporter_installer_suffix: ".msi"
-  when: ansible_system == "Win32NT"
+  when: ansible_system == 'Win32NT'
 
 - name: "Set installer variables - Linux, other"
   set_fact:
@@ -109,7 +109,7 @@
     # node_exporter_releases_url: "https://github.com/prometheus/node_exporter/releases"
     # node_exporter_installer_name: "node_exporter"
     # node_exporter_installer_suffix: ".tar.gz"
-  when: ansible_system != "Win32NT"
+  when: ansible_system != 'Win32NT'
 
 - block:
     - name: Get latest release

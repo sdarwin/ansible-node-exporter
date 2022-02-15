@@ -116,12 +116,10 @@ jobs:
         run: |
           set -x
           uname -a || true
-          pwd || true
           whoami || true
           ls -al || true
-          which python3 || true
-          which pip3 || true
-          netstat -anptu || true
+          pwd || true
+          chmod -R 755 .
           privatekey1="-----BEGIN OPENSSH PRIVATE KEY-----
           b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
           NhAAAAAwEAAQAAAYEArlFRc1QK3UAuCxmZFt6kStSs8Vl9ygJX4ja9qfR9St4U/upJLco+
@@ -162,7 +160,7 @@ jobs:
           -----END OPENSSH PRIVATE KEY-----"
 
           mkdir /root/.ssh
-          echo $privatekey1 > /root/.ssh/id_rsa
+          echo "$privatekey1" > /root/.ssh/id_rsa
           chmod -R 700 /root/.ssh
           echo "Checking id_rsa"
           cat /root/.ssh/id_rsa

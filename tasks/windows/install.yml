@@ -77,7 +77,7 @@
 
     - name: Make tmp dir - Windows
       ansible.windows.win_file:
-        path: "C:\\tmp"
+        path: 'C:\tmp'
         state: directory
       when:
         - not ansible_check_mode
@@ -86,7 +86,7 @@
     - name: Propagate node_exporter binaries - Windows
       copy:
         src: "/tmp/windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi"
-        dest: "C:\\tmp\\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi"
+        dest: 'C:\tmp\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi'
         mode: 0755
         owner: root
       notify: restart node_exporter
@@ -107,8 +107,7 @@
 
     - name: install Windows exporter
       win_package:
-        # path: "C:\\tmp\\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi"
-        path: 'C:\\tmp\\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi'
+        path: 'C:\tmp\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi'
         arguments: 'EXTRA_FLAGS="--config.file ""C:\Program Files\windows_exporter\config.yaml"""'
         state: present
       when:

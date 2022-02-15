@@ -6,7 +6,7 @@
 
 - block:
     - name: Set node_exporter_web_config
-      set_fact: 
+      set_fact:
         node_exporter_web_config: "web.config.yaml"
 
     - name: Copy the windows_exporter web config file
@@ -23,7 +23,7 @@
 #   template:
 #     src: windows.config.yaml.j2
 #     dest: "{{ _node_exporter_binary_install_dir_windows }}\\config.yaml"
-#   notify: restart windows_exporter 
+#   notify: restart windows_exporter
 
 - name: Create textfile collector dir
   win_file:

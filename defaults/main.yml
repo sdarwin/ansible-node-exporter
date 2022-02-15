@@ -25,7 +25,7 @@ node_exporter_enabled_collectors:
 
 node_exporter_disabled_collectors: []
 
-node_exporter_enabled_collectors_windows: 
+node_exporter_enabled_collectors_windows:
   - "[defaults]"
   - "memory"
 
@@ -38,7 +38,7 @@ node_exporter_collector_service_services_where: "Name='windows_exporter'"
 
 # Internal variables.
 _node_exporter_binary_install_dir: "/usr/local/bin"
-_node_exporter_binary_install_dir_windows: "C:\\Program Files\\windows_exporter"
+_node_exporter_binary_install_dir_windows: 'C:\Program Files\windows_exporter'
 _node_exporter_system_group: "node-exp"
 _node_exporter_system_user: "{{ _node_exporter_system_group }}"
 _node_exporter_root_group: "{% if ansible_distribution == 'MacOSX' %}wheel{% else %}root{% endif %}"

@@ -9,65 +9,65 @@ name: ci
       - feature/*
 
 jobs:
-  macos:
-    name: macos
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include: 
-          - os: macos-10.15
-            ansible_python_interpreter: /usr/local/bin/python3
-        scenario:
-          - latest
-          - default
-          - alternative
-        ansible_version:
-          - "2.9"
-          - "2.10"
-          - "4.10"
-          - "5.1"
+  # macos:
+  #   name: macos
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include: 
+  #         - os: macos-10.15
+  #           ansible_python_interpreter: /usr/local/bin/python3
+  #       scenario:
+  #         - latest
+  #         - default
+  #         - alternative
+  #       ansible_version:
+  #         - "2.9"
+  #         - "2.10"
+  #         - "4.10"
+  #         - "5.1"
 
-    steps:
-      - name: Check out the codebase
-        uses: actions/checkout@v2
+  #   steps:
+  #     - name: Check out the codebase
+  #       uses: actions/checkout@v2
 
-      - name: Install ansible
-        run: sudo pip3 install "ansible~=${{ matrix.ansible_version }}.0"
+  #     - name: Install ansible
+  #       run: sudo pip3 install "ansible~=${{ matrix.ansible_version }}.0"
 
-      - name: Set up the test environment
-        run: |
-          cp tests/test-inventory ./test-inventory
-          cp tests/ansible.cfg ./ansible.cfg
-          sudo pip3 install -r test-requirements.txt
-          mkdir -p /Users/runner/.ansible/roles
-          ln -s $GITHUB_WORKSPACE /Users/runner/.ansible/roles/cloudalchemy.node_exporter
+  #     - name: Set up the test environment
+  #       run: |
+  #         cp tests/test-inventory ./test-inventory
+  #         cp tests/ansible.cfg ./ansible.cfg
+  #         sudo pip3 install -r test-requirements.txt
+  #         mkdir -p /Users/runner/.ansible/roles
+  #         ln -s $GITHUB_WORKSPACE /Users/runner/.ansible/roles/cloudalchemy.node_exporter
 
-      - name: playbook tests
-        run: |
-          if [[ -n "${{ github.event.pull_request.number }}" ]] && [[ "${{ matrix.scenario }}" == 'latest' ]]; then
-            echo "Not testing 'latest' and 'pull request'"
-          else
-            echo "Test the playbook's syntax"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
+  #     - name: playbook tests
+  #       run: |
+  #         if [[ -n "${{ github.event.pull_request.number }}" ]] && [[ "${{ matrix.scenario }}" == 'latest' ]]; then
+  #           echo "Not testing 'latest' and 'pull request'"
+  #         else
+  #           echo "Test the playbook's syntax"
+  #           ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
 
-            echo "Run the prepare playbook"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
+  #           echo "Run the prepare playbook"
+  #           ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
 
-            echo "Run the main playbook"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
+  #           echo "Run the main playbook"
+  #           ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
 
-            echo "Test the results"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/${{ matrix.scenario }}/macosx.yml
+  #           echo "Test the results"
+  #           ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/${{ matrix.scenario }}/macosx.yml
 
-            echo "Idempotence check"
-            idempotence=$(mktemp)
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
-            tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
-          fi
-        env:
-          ANSIBLE_FORCE_COLOR: '1'
-          OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
+  #           echo "Idempotence check"
+  #           idempotence=$(mktemp)
+  #           ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
+  #           tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
+  #         fi
+  #       env:
+  #         ANSIBLE_FORCE_COLOR: '1'
+  #         OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
   windows:
     name: windows
     runs-on: ${{ matrix.os }}
@@ -85,45 +85,56 @@ jobs:
           - "2.9"
           - "2.10"
           - "4.10"
-          - "5.1"
-
     steps:
-      - name: Check out the codebase
-        uses: actions/checkout@v2
+      - uses: Vampire/setup-wsl@v1
+        with:
+          distribution: Ubuntu-20.04
 
-      - name: Install ansible
-        run: pip.exe install "ansible~=${{ matrix.ansible_version }}.0"
-
-      - name: Set up the test environment
+      - shell: wsl-bash {0}
         run: |
-          tests/test-inventory ./test-inventory
-          tests/ansible.cfg ./ansible.cfg
-          pip.exe install -r test-requirements.txt
-          mkdir 'C:\runner\.ansible\roles'
-          mklink /d $GITHUB_WORKSPACE 'C:\runner\.ansible\roles\cloudalchemy.node_exporter'
+          set -x
+          uname -a || true
+          pwd || true
+          whoami || true
+          ls -al || true
+          which python3 || true
 
-      - name: playbook tests
-        run: |
-          if [[ -n "${{ github.event.pull_request.number }}" ]] && [[ "${{ matrix.scenario }}" == 'latest' ]]; then
-            echo "Not testing 'latest' and 'pull request'"
-          else
-            echo "Test the playbook's syntax"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
+          # - name: Check out the codebase
+          #   uses: actions/checkout@v2
 
-            echo "Run the prepare playbook"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
+          # - name: Install ansible
+          #   run: pip.exe install "ansible~=${{ matrix.ansible_version }}.0"
 
-            echo "Run the main playbook"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
+          # - name: Set up the test environment
+          #   run: |
+          #     tests/test-inventory ./test-inventory
+          #     tests/ansible.cfg ./ansible.cfg
+          #     pip.exe install -r test-requirements.txt
+          #     mkdir 'C:\runner\.ansible\roles'
+          #     mklink /d $GITHUB_WORKSPACE 'C:\runner\.ansible\roles\cloudalchemy.node_exporter'
 
-            echo "Test the results"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/${{ matrix.scenario }}/windows.yml
+          # - name: playbook tests
+          #   run: |
+          #     if [[ -n "${{ github.event.pull_request.number }}" ]] && [[ "${{ matrix.scenario }}" == 'latest' ]]; then
+          #       echo "Not testing 'latest' and 'pull request'"
+          #     else
+          #       echo "Test the playbook's syntax"
+          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
 
-            echo "Idempotence check"
-            idempotence=$(mktemp)
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
-            tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
-          fi
-        env:
-          ANSIBLE_FORCE_COLOR: '1'
-          OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
+          #       echo "Run the prepare playbook"
+          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
+
+          #       echo "Run the main playbook"
+          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
+
+          #       echo "Test the results"
+          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/${{ matrix.scenario }}/windows.yml
+
+          #       echo "Idempotence check"
+          #       idempotence=$(mktemp)
+          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
+          #       tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
+          #     fi
+          #   env:
+          #     ANSIBLE_FORCE_COLOR: '1'
+          #     OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'

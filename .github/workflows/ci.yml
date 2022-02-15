@@ -173,15 +173,16 @@ jobs:
         shell: wsl-bash {0}
         run: |
           set -xe
-          mkdir /etc/ansible
-          chmod 755 /etc/ansible
+          mkdir -p /etc/ansible/roles
+          chmod -R 755 /etc/ansible
           cp tests/test-inventory /etc/ansible/hosts
           ls -al /etc/ansible
           cp tests/ansible.cfg.windows /etc/ansible/ansible.cfg
           pip3 install -r test-requirements.txt
           mkdir -p $HOME/.ansible/roles
-          ln -s . $HOME/.ansible/roles/cloudalchemy.node_exporter
-          ls -al $HOME/.ansible/roles/cloudalchemy.node_exporter
+          WORKSPACE_PATH=$(pwd)
+          ln -s $WORKSPACE_PATH /etc/ansible/roles/cloudalchemy.node_exporter
+          ls -al /etc/ansible/roles/cloudalchemy.node_exporter
 
       - name: playbook tests
         shell: wsl-bash {0}

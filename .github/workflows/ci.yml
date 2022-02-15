@@ -86,6 +86,9 @@ jobs:
           - "2.10"
           - "4.10"
     steps:
+      - name: Check out the codebase
+
+        uses: actions/checkout@v2
       - uses: Vampire/setup-wsl@v1
         with:
           distribution: Ubuntu-20.04
@@ -98,12 +101,10 @@ jobs:
           whoami || true
           ls -al || true
           which python3 || true
+          which pip3 || true
 
-          # - name: Check out the codebase
-          #   uses: actions/checkout@v2
-
-          # - name: Install ansible
-          #   run: pip.exe install "ansible~=${{ matrix.ansible_version }}.0"
+      - name: Install ansible
+        run: pip3 install "ansible~=${{ matrix.ansible_version }}.0"
 
           # - name: Set up the test environment
           #   run: |

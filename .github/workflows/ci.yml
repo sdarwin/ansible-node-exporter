@@ -112,14 +112,21 @@ jobs:
             python3-pip
             net-tools
 
-      - name: set up ubuntu environment
+      - name: set up the test environment
         shell: wsl-bash {0}
         run: |
-          set -x
-          uname -a || true
-          whoami || true
-          ls -al || true
-          pwd || true
+          set -xe
+          mkdir -p /etc/ansible/roles
+          chmod -R 755 /etc/ansible
+          cp tests/test-inventory.windows /etc/ansible/hosts
+          ls -al /etc/ansible
+          cp tests/ansible.cfg.windows /etc/ansible/ansible.cfg
+          pip3 install "ansible~=${{ matrix.ansible_version }}.0"
+          pip3 install -r test-requirements.txt
+          WORKSPACE_PATH=$(pwd)
+          ln -s $WORKSPACE_PATH /etc/ansible/roles/cloudalchemy.node_exporter
+          ls -al /etc/ansible/roles/cloudalchemy.node_exporter
+
           privatekey1="-----BEGIN OPENSSH PRIVATE KEY-----
           b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
           NhAAAAAwEAAQAAAYEArlFRc1QK3UAuCxmZFt6kStSs8Vl9ygJX4ja9qfR9St4U/upJLco+
@@ -164,25 +171,6 @@ jobs:
           chmod -R 700 /root/.ssh
           echo "Checking id_rsa"
           cat /root/.ssh/id_rsa
-
-      - name: Install ansible
-        shell: wsl-bash {0}
-        run: pip3 install "ansible~=${{ matrix.ansible_version }}.0"
-
-      - name: Set up the test environment
-        shell: wsl-bash {0}
-        run: |
-          set -xe
-          mkdir -p /etc/ansible/roles
-          chmod -R 755 /etc/ansible
-          cp tests/test-inventory /etc/ansible/hosts
-          ls -al /etc/ansible
-          cp tests/ansible.cfg.windows /etc/ansible/ansible.cfg
-          pip3 install -r test-requirements.txt
-          mkdir -p $HOME/.ansible/roles
-          WORKSPACE_PATH=$(pwd)
-          ln -s $WORKSPACE_PATH /etc/ansible/roles/cloudalchemy.node_exporter
-          ls -al /etc/ansible/roles/cloudalchemy.node_exporter
 
       - name: playbook tests
         shell: wsl-bash {0}

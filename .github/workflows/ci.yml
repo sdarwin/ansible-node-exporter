@@ -109,8 +109,10 @@ jobs:
           distribution: Ubuntu-20.04
           additional-packages:
             python3-pip
+            net-tools
 
-      - shell: wsl-bash {0}
+      - name: set up ubuntu environment
+        shell: wsl-bash {0}
         run: |
           set -x
           uname -a || true
@@ -120,41 +122,85 @@ jobs:
           which python3 || true
           which pip3 || true
           netstat -anptu || true
+          privatekey1="
+-----BEGIN OPENSSH PRIVATE KEY-----
+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
+-----END OPENSSH PRIVATE KEY-----"
+
+        echo $privatekey1 > /root/.ssh/id_rsa
+        chmod 700 /root/.ssh/id_rsa
 
       - name: Install ansible
         shell: wsl-bash {0}
         run: pip3 install "ansible~=${{ matrix.ansible_version }}.0"
 
-          # - name: Set up the test environment
-          #   run: |
-          #     tests/test-inventory ./test-inventory
-          #     tests/ansible.cfg ./ansible.cfg
-          #     pip.exe install -r test-requirements.txt
-          #     mkdir 'C:\runner\.ansible\roles'
-          #     mklink /d $GITHUB_WORKSPACE 'C:\runner\.ansible\roles\cloudalchemy.node_exporter'
+      - name: Set up the test environment
+        shell: wsl-bash {0}
+        run: |
+          tests/test-inventory ./test-inventory
+          tests/ansible.cfg ./ansible.cfg
+          pip.exe install -r test-requirements.txt
+          mkdir $HOME\.ansible\roles'
+          ln -s . 'C:\runner\.ansible\roles\cloudalchemy.node_exporter'
 
-          # - name: playbook tests
-          #   run: |
-          #     if [[ -n "${{ github.event.pull_request.number }}" ]] && [[ "${{ matrix.scenario }}" == 'latest' ]]; then
-          #       echo "Not testing 'latest' and 'pull request'"
-          #     else
-          #       echo "Test the playbook's syntax"
-          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
+      - name: playbook tests
+        shell: wsl-bash {0}
+        run: |
+           if [[ -n "${{ github.event.pull_request.number }}" ]] && [[ "${{ matrix.scenario }}" == 'latest' ]]; then
+             echo "Not testing 'latest' and 'pull request'"
+           else
+             echo "Test the playbook's syntax"
+             ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
 
-          #       echo "Run the prepare playbook"
-          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
+             echo "Run the prepare playbook"
+             ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
 
-          #       echo "Run the main playbook"
-          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
+             echo "Run the main playbook"
+             ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
 
-          #       echo "Test the results"
-          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/${{ matrix.scenario }}/windows.yml
+             echo "Test the results"
+             ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/${{ matrix.scenario }}/windows.yml
 
-          #       echo "Idempotence check"
-          #       idempotence=$(mktemp)
-          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
-          #       tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
-          #     fi
-          #   env:
-          #     ANSIBLE_FORCE_COLOR: '1'
-          #     OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
+             echo "Idempotence check"
+             idempotence=$(mktemp)
+             ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
+             tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
+           fi
+         env:
+           ANSIBLE_FORCE_COLOR: '1'
+           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'

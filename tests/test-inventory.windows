@@ -1,2 +1,8 @@
-[local]
+[windows]
 localhost
+
+[windows:vars]
+ansible_user=Administrator
+ansible_shell_type=cmd
+ansible_python_interpreter='C:\Python310\python.exe'
+ansible_become=false

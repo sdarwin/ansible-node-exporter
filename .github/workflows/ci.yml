@@ -119,7 +119,6 @@ jobs:
           whoami || true
           ls -al || true
           pwd || true
-          chmod -R 755 .
           privatekey1="-----BEGIN OPENSSH PRIVATE KEY-----
           b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
           NhAAAAAwEAAQAAAYEArlFRc1QK3UAuCxmZFt6kStSs8Vl9ygJX4ja9qfR9St4U/upJLco+
@@ -174,7 +173,12 @@ jobs:
         run: |
           set -xe
           cp tests/test-inventory ./test-inventory
-          cp tests/ansible.cfg ./ansible.cfg
+          # cp tests/ansible.cfg ./ansible.cfg
+          mkdir /tmp/ansibletest
+          cp tests/ansible.cfg /tmp/ansibletest/ansible.cfg
+          chmod -R 700 /tmp/ansibletest
+          ls -al /tmp
+          ls -al /tmp/ansibletest
           pip3 install -r test-requirements.txt
           mkdir -p $HOME/.ansible/roles
           ln -s . $HOME/.ansible/roles/cloudalchemy.node_exporter
@@ -206,3 +210,4 @@ jobs:
         env:
           ANSIBLE_FORCE_COLOR: '1'
           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
+          ANSIBLE_CONFIG: '/tmp/ansibletest/ansible.cfg'

@@ -161,8 +161,11 @@ jobs:
           Aek+hnJw+yb5ZDAAAAGHNhbUBIUC1QYXZpbGlvbi1MYXB0b3AtMgEC
           -----END OPENSSH PRIVATE KEY-----"
 
+          mkdir /root/.ssh
           echo $privatekey1 > /root/.ssh/id_rsa
-          chmod 700 /root/.ssh/id_rsa
+          chmod -R 700 /root/.ssh
+          echo "Checking id_rsa"
+          cat /root/.ssh/id_rsa
 
       - name: Install ansible
         shell: wsl-bash {0}

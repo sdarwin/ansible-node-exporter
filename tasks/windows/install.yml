@@ -83,8 +83,8 @@
         - not ansible_check_mode
         - ansible_system == 'Win32NT'
 
-    - name: Propagate node_exporter binaries - Windows
-      copy:
+    - name: Propagate windows_exporter installer - Windows
+      win_copy:
         src: "/tmp/windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi"
         dest: 'C:\tmp\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi'
         mode: 0755

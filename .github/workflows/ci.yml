@@ -190,20 +190,20 @@ jobs:
             echo "Not testing 'latest' and 'pull request'"
           else
             echo "Test the playbook's syntax"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
+            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook-windows.yml --syntax-check
 
             echo "Run the prepare playbook"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
+            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare-windows.yml
 
             echo "Run the main playbook"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
+            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook-windows.yml
 
             echo "Test the results"
             ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/${{ matrix.scenario }}/windows.yml
 
             echo "Idempotence check"
             idempotence=$(mktemp)
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
+            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook-windows.yml | tee -a ${idempotence}
             tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
           fi
         env:

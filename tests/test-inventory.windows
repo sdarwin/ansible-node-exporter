@@ -2,7 +2,8 @@
 localhost
 
 [windows:vars]
-ansible_user=Administrator
+ansible_user=runneradmin
+ansible_ssh_pass=9!test12345678
 ansible_shell_type=cmd
 ansible_python_interpreter='C:\Python310\python.exe'
 ansible_become=false

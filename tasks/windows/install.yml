@@ -108,11 +108,57 @@
     - name: install Windows exporter
       win_package:
         path: 'C:\tmp\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi'
-        arguments: 'EXTRA_FLAGS="--config.file ""C:\Program Files\windows_exporter\config.yaml"""'
+        # DEBUGGING:
+        # arguments: 'EXTRA_FLAGS="--config.file ""C:\Program Files\windows_exporter\config.yaml"""'
         state: present
       when:
         - not ansible_check_mode
         - ansible_system == 'Win32NT'
+      # DEBUGGING:
+      failed_when: false
+
+    # DEBUGGING:
+    - name: check dir
+      ansible.windows.win_command: 'dir ""C:\Program Files\windows_exporter""'
+      args:
+        warn: false
+      failed_when: false
+      register: __debug1
+      when:
+        - ansible_system == 'Win32NT'
+
+    # DEBUGGING:
+    - name: debugging
+      debug:
+        var: __debug1
+
+    - name: check config
+      ansible.windows.win_command: 'cat ""C:\Program Files\windows_exporter\config.yaml""'
+      args:
+        warn: false
+      failed_when: false
+      register: __debug1
+      when:
+        - ansible_system == 'Win32NT'
+
+    # DEBUGGING:
+    - name: debugging
+      debug:
+        var: __debug1
+
+    - name: manually run windows_explorer
+      ansible.windows.win_command: '""C:\Program Files\windows_exporter\windows_explorer"" --config.file ""C:\Program Files\windows_exporter\config.yaml""'
+      args:
+        warn: false
+      failed_when: false
+      register: __debug1
+      when:
+        - ansible_system == 'Win32NT'
+
+    - name: debugging
+      debug:
+        var: __debug1
+
 
   when:
     - node_exporter_binary_local_dir | length == 0
@@ -129,7 +175,7 @@
     - node_exporter_local_installer | length > 0
     - not ansible_check_mode
 
-- name: install Windows exporter
+- name: install locally distributed Windows exporter
   win_package:
     path: "/tmp/windows_exporter.msi"
     arguments: 'EXTRA_FLAGS="--config.file ""C:\Program Files\windows_exporter\config.yaml"""'

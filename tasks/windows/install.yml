@@ -120,8 +120,6 @@
     # DEBUGGING:
     - name: check dir
       ansible.windows.win_command: 'dir "C:\Program Files\windows_exporter"'
-      args:
-        warn: false
       failed_when: false
       register: __debug1
       when:
@@ -134,8 +132,6 @@
 
     - name: check config
       ansible.windows.win_command: 'cat "C:\Program Files\windows_exporter\config.yaml"'
-      args:
-        warn: false
       failed_when: false
       register: __debug1
       when:
@@ -146,19 +142,18 @@
       debug:
         var: __debug1
 
-    - name: manually run windows_explorer
-      ansible.windows.win_command: '""C:\Program Files\windows_exporter\windows_explorer"" --config.file ""C:\Program Files\windows_exporter\config.yaml""'
-      args:
-        warn: false
-      failed_when: false
-      register: __debug1
-      when:
-        - ansible_system == 'Win32NT'
-
-    - name: debugging
-      debug:
-        var: __debug1
-
+        #     - name: manually run windows_explorer
+        #       ansible.windows.win_command: '""C:\Program Files\windows_exporter\windows_explorer"" --config.file ""C:\Program Files\windows_exporter\config.yaml""'
+        #       args:
+        #         warn: false
+        #       failed_when: false
+        #       register: __debug1
+        #       when:
+        #         - ansible_system == 'Win32NT'
+        #
+        #     - name: debugging
+        #       debug:
+        #         var: __debug1
 
   when:
     - node_exporter_binary_local_dir | length == 0

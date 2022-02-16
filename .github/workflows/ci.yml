@@ -178,9 +178,9 @@ jobs:
           echo "Checking id_rsa"
           cat /root/.ssh/id_rsa
           echo "check one"
-          ssh -o StrictHostKeyChecking=no Administrator@localhost ls -al
+          ssh -o StrictHostKeyChecking=no Administrator@localhost dir
           echo "and again"
-          ssh -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa Administrator@localhost ls -al
+          ssh -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa Administrator@localhost dir
 
           # - name: playbook tests
           #   shell: wsl-bash {0}

@@ -117,12 +117,38 @@
   when:
     - node_exporter_binary_local_dir | length == 0
 
-- name: propagate locally distributed node_exporter binary
+- name: propagate locally distributed windows installer
+  copy:
+    src: "{{ node_exporter_local_installer }}"
+    dest: "/tmp/windows_exporter.msi"
+    mode: 0755
+    owner: root
+    group: "{{ _node_exporter_root_group }}"
+  when:
+        - ansible_system == 'Win32NT'
+        - node_exporter_local_installer | length > 0
+        - not ansible_check_mode
+
+- name: install Windows exporter
+  win_package:
+    path: "/tmp/windows_exporter.msi"
+    arguments: 'EXTRA_FLAGS="--config.file ""C:\Program Files\windows_exporter\config.yaml"""'
+    state: present
+  when:
+    - ansible_system == 'Win32NT'
+    - node_exporter_local_installer | length > 0
+    - not ansible_check_mode
+  notify: restart windows_exporter
+
+  - name: propagate locally distributed node_exporter binary
   copy:
     src: "{{ node_exporter_binary_local_dir }}/node_exporter"
     dest: "{{ _node_exporter_binary_install_dir }}/node_exporter"
     mode: 0755
     owner: root
     group: "{{ _node_exporter_root_group }}"
-  when: node_exporter_binary_local_dir | length > 0
+  when:
+    - ansible_system != 'Win32NT'
+    - node_exporter_binary_local_dir | length > 0
   notify: restart node_exporter
+

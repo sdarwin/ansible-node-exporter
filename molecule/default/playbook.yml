@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: targetnodes
   any_errors_fatal: true
   roles:
     - cloudalchemy.node_exporter

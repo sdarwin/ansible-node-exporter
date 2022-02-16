@@ -1,6 +1,6 @@
 ---
 - name: Prepare
-  hosts: localhost
+  hosts: targetnodes
   gather_facts: true
   vars:
     go_arch: amd64

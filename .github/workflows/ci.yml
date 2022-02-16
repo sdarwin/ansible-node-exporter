@@ -105,7 +105,8 @@ jobs:
           icacls $keysfile /remove "Users"
           icacls $keysfile /remove "Authenticated Users"
 
-          Add-Content 'C:\ProgramData\ssh\sshd_config' "PasswordAuthentication no"
+          # trying with password instead. Disabling this line:
+          # Add-Content 'C:\ProgramData\ssh\sshd_config' "PasswordAuthentication no"
           sleep 10
           Restart-Service -Name sshd
           # sshd was not working. wait. What about runneradmin user.
@@ -116,6 +117,7 @@ jobs:
           additional-packages:
             python3-pip
             net-tools
+            sshpass
 
       - name: set up the test environment
         shell: wsl-bash {0}
@@ -173,14 +175,15 @@ jobs:
           -----END OPENSSH PRIVATE KEY-----"
 
           mkdir /root/.ssh
-          echo "$privatekey1" > /root/.ssh/id_rsa
+          # not using. Put into .bck instead
+          echo "$privatekey1" > /root/.ssh/id_rsa.bck
           chmod -R 700 /root/.ssh
           echo "Checking id_rsa"
           cat /root/.ssh/id_rsa
           echo "check one"
-          ssh -o StrictHostKeyChecking=no runneradmin@localhost dir
-          echo "and again"
-          ssh -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa runneradmin@localhost dir
+          sshpass -p "9!test12345678" ssh -o StrictHostKeyChecking=no runneradmin@localhost dir
+          # echo "and again"
+          # sshpass -p "9!test12345678" ssh -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa runneradmin@localhost dir
 
           # - name: playbook tests
           #   shell: wsl-bash {0}

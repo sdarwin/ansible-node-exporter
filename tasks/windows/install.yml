@@ -119,7 +119,7 @@
 
     # DEBUGGING:
     - name: check dir
-      ansible.windows.win_command: 'dir ""C:\Program Files\windows_exporter""'
+      ansible.windows.win_command: 'dir "C:\Program Files\windows_exporter"'
       args:
         warn: false
       failed_when: false
@@ -133,7 +133,7 @@
         var: __debug1
 
     - name: check config
-      ansible.windows.win_command: 'cat ""C:\Program Files\windows_exporter\config.yaml""'
+      ansible.windows.win_command: 'cat "C:\Program Files\windows_exporter\config.yaml"'
       args:
         warn: false
       failed_when: false

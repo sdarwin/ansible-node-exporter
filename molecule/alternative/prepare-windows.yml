@@ -20,7 +20,7 @@
 
     - name: link to node_exporter binaries directory
       become: false
-      win_file:
+      file:
         src: "/tmp/windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi"
         dest: "/tmp/windows_exporter-{{ go_arch }}.msi"
         state: link

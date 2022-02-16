@@ -4,7 +4,7 @@
   gather_facts: true
   vars:
     go_arch: amd64
-    node_exporter_version: 1.3.1
+    node_exporter_version_windows: 0.18.1
   tasks:
     - name: Download windows_exporter binary to local folder
       become: false

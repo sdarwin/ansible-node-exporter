@@ -131,6 +131,7 @@ jobs:
           cp tests/ansible.cfg.windows /etc/ansible/ansible.cfg
           pip3 install "ansible~=${{ matrix.ansible_version }}.0"
           pip3 install -r tests/test-requirements.windows.txt
+          ansible-galaxy collection install ansible.windows
           WORKSPACE_PATH=$(pwd)
           ln -s $WORKSPACE_PATH /etc/ansible/roles/cloudalchemy.node_exporter
           ls -al /etc/ansible/roles/cloudalchemy.node_exporter

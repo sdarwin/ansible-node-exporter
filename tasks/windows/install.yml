@@ -125,9 +125,9 @@
     owner: root
     group: "{{ _node_exporter_root_group }}"
   when:
-        - ansible_system == 'Win32NT'
-        - node_exporter_local_installer | length > 0
-        - not ansible_check_mode
+    - ansible_system == 'Win32NT'
+    - node_exporter_local_installer | length > 0
+    - not ansible_check_mode
 
 - name: install Windows exporter
   win_package:
@@ -140,7 +140,7 @@
     - not ansible_check_mode
   notify: restart windows_exporter
 
-  - name: propagate locally distributed node_exporter binary
+- name: propagate locally distributed node_exporter binary
   copy:
     src: "{{ node_exporter_binary_local_dir }}/node_exporter"
     dest: "{{ _node_exporter_binary_install_dir }}/node_exporter"
@@ -151,4 +151,3 @@
     - ansible_system != 'Win32NT'
     - node_exporter_binary_local_dir | length > 0
   notify: restart node_exporter
-

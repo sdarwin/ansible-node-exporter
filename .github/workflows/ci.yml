@@ -93,19 +93,20 @@ jobs:
       - name: install ssh
         run: |
           Set-PSDebug -Trace 1
-          $pubkey1 = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCuUVFzVArdQC4LGZkW3qRK1KzxWX3KAlfiNr2p9H1K3hT+6kktyj7+N1s3rFl7HudzHkLJ3lnz6iBaF2GDHxzSlBuLQz5ACt41tk3bHjVhT9j0/1HgpYabnNlOFRkx3bDS7mLdUIsBtGj6DpvlTvW9HD67tvQy8HkdtbybSsv/Y8yRk7SDuSoNYq9jdbk3aTNXVlXnOvk11bUAQEn4OLvh/eHCHd5XS3yVEspWAyZsbDSJs5SD30lfj94d5Z6c3LQ9/f+PbKwEV7QP0S8S9MaFN8bk7abEXjLDpOE3yPB5JY+vvmrR3YP6XZ78xqWMsiI/yGQn8+e01k1p0ObHlK5qtqLUywbnRxCzjlDDV07NjdGqyi/QFe36TOcLVpvAoGW/mjEvuHZECeo7xv/kg7oqnAhEvngplB79xZOg1jeLOXGhWupF6OFTC3xPQ/SayFfx0apXJA/44V8IGJgJrdafwb4zheFvYOHhdhyWA581Ywh4h+xA5iupwdC3xbtbLbE= "
+          $pubkey1 = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCuUVFzVArdQC4LGZkW3qRK1KzxWX3KAlfiNr2p9H1K3hT+6kktyj7+N1s3rFl7HudzHkLJ3lnz6iBaF2GDHxzSlBuLQz5ACt41tk3bHjVhT9j0/1HgpYabnNlOFRkx3bDS7mLdUIsBtGj6DpvlTvW9HD67tvQy8HkdtbybSsv/Y8yRk7SDuSoNYq9jdbk3aTNXVlXnOvk11bUAQEn4OLvh/eHCHd5XS3yVEspWAyZsbDSJs5SD30lfj94d5Z6c3LQ9/f+PbKwEV7QP0S8S9MaFN8bk7abEXjLDpOE3yPB5JY+vvmrR3YP6XZ78xqWMsiI/yGQn8+e01k1p0ObHlK5qtqLUywbnRxCzjlDDV07NjdGqyi/QFe36TOcLVpvAoGW/mjEvuHZECeo7xv/kg7oqnAhEvngplB79xZOg1jeLOXGhWupF6OFTC3xPQ/SayFfx0apXJA/44V8IGJgJrdafwb4zheFvYOHhdhyWA581Ywh4h+xA5iupwdC3xbtbLbE="
           $keysfile = 'C:\ProgramData\ssh\administrators_authorized_keys'
-          iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
+          # iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
           choco install -y --package-parameters=/SSHServerFeature openssh
-
+          sleep 10
           Add-Content $keysfile $pubkey1
           icacls $keysfile /inheritance:d
           icacls $keysfile /remove "Users"
           icacls $keysfile /remove "Authenticated Users"
 
           Add-Content 'C:\ProgramData\ssh\sshd_config' "PasswordAuthentication no"
+          sleep 10
           Restart-Service -Name sshd
-          echo "Key file is:  "
+          echo "Key file is $keysfile  "
           cat $keysfile
           echo "sshd_config is:  "
           cat 'C:\ProgramData\ssh\sshd_config'
@@ -120,7 +121,7 @@ jobs:
       - name: set up the test environment
         shell: wsl-bash {0}
         run: |
-          set -xe
+          set -x
           mkdir -p /etc/ansible/roles
           chmod -R 755 /etc/ansible
           cp tests/test-inventory.windows /etc/ansible/hosts
@@ -176,32 +177,36 @@ jobs:
           chmod -R 700 /root/.ssh
           echo "Checking id_rsa"
           cat /root/.ssh/id_rsa
+          echo "check one"
+          ssh -o StrictHostKeyChecking=no Administrator@localhost ls -al
+          echo "and again"
+          ssh -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa Administrator@localhost ls -al
 
-      - name: playbook tests
-        shell: wsl-bash {0}
-        run: |
-          set -xe
-          if [[ -n "${{ github.event.pull_request.number }}" ]] && [[ "${{ matrix.scenario }}" == 'latest' ]]; then
-            echo "Not testing 'latest' and 'pull request'"
-          else
-            echo "Test the playbook's syntax"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
+          # - name: playbook tests
+          #   shell: wsl-bash {0}
+          #   run: |
+          #     set -xe
+          #     if [[ -n "${{ github.event.pull_request.number }}" ]] && [[ "${{ matrix.scenario }}" == 'latest' ]]; then
+          #       echo "Not testing 'latest' and 'pull request'"
+          #     else
+          #       echo "Test the playbook's syntax"
+          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
 
-            echo "Run the prepare playbook"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
+          #       echo "Run the prepare playbook"
+          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
 
-            echo "Run the main playbook"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
+          #       echo "Run the main playbook"
+          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
 
-            echo "Test the results"
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/${{ matrix.scenario }}/windows.yml
+          #       echo "Test the results"
+          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/${{ matrix.scenario }}/windows.yml
 
-            echo "Idempotence check"
-            idempotence=$(mktemp)
-            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
-            tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
-          fi
-        env:
-          ANSIBLE_FORCE_COLOR: '1'
-          OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
-          ANSIBLE_CONFIG: '/etc/ansible/ansible.cfg'
+          #       echo "Idempotence check"
+          #       idempotence=$(mktemp)
+          #       ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
+          #       tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
+          #     fi
+          #   env:
+          #     ANSIBLE_FORCE_COLOR: '1'
+          #     OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
+          #     ANSIBLE_CONFIG: '/etc/ansible/ansible.cfg'

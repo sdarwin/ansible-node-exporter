@@ -178,8 +178,6 @@ jobs:
           # not using. Put into .bck instead
           echo "$privatekey1" > /root/.ssh/id_rsa.bck
           chmod -R 700 /root/.ssh
-          echo "Checking id_rsa"
-          cat /root/.ssh/id_rsa
           echo "check one"
           sshpass -p "9!test12345678" ssh -o StrictHostKeyChecking=no runneradmin@localhost dir
           # echo "and again"

@@ -38,6 +38,14 @@
     - ansible_system != 'Win32NT'
     - not install_dir_check.stat.exists
 
+- name: Make tmp dir - Windows
+  ansible.windows.win_file:
+    path: 'C:\tmp'
+    state: directory
+  when:
+    - not ansible_check_mode
+    - ansible_system == 'Win32NT'
+
 - block:
     - name: Download node_exporter binary to local folder - Windows
       become: false
@@ -81,14 +89,6 @@
       check_mode: false
       when:
         - ansible_system != 'Win32NT'
-
-    - name: Make tmp dir - Windows
-      ansible.windows.win_file:
-        path: 'C:\tmp'
-        state: directory
-      when:
-        - not ansible_check_mode
-        - ansible_system == 'Win32NT'
 
     - name: Propagate windows_exporter installer - Windows
       win_copy:

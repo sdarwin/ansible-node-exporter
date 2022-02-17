@@ -5,14 +5,14 @@
     state: directory
 
 - block:
-    - name: Set node_exporter_web_config
+    - name: Set _node_exporter_web_config
       set_fact:
-        __node_exporter_web_config: "web.config.yaml"
+        _node_exporter_web_config: "web.config.yaml"
 
     - name: Copy the windows_exporter web config file
       template:
         src: config.yaml.j2
-        dest: "{{ _node_exporter_binary_install_dir_windows }}\\{{ node_exporter_web_config }}"
+        dest: "{{ _node_exporter_binary_install_dir_windows }}\\{{ _node_exporter_web_config }}"
       notify: restart windows_exporter
   when:
     ( node_exporter_tls_server_config | length > 0 ) or

@@ -4,10 +4,18 @@
     path: "{{ _node_exporter_binary_install_dir_windows }}"
     state: directory
 
+- name: Set a default web.config.yaml flag
+  set_fact:
+    __node_exporter_web_config_flag: ""
+
 - block:
     - name: Set node_exporter_web_config
       set_fact:
-        node_exporter_web_config: "web.config.yaml"
+        __node_exporter_web_config: "web.config.yaml"
+
+    - name: Set web.config.yaml flag
+      set_fact:
+        __node_exporter_web_config_flag: ' --web.config.file {{ node_exporter_web_config }}'
 
     - name: Copy the windows_exporter web config file
       template:

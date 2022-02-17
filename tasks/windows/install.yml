@@ -115,7 +115,7 @@
     - name: install Windows exporter
       win_package:
         path: 'C:\tmp\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi'
-        arguments: 'EXTRA_FLAGS="--config.file ""C:\Program Files\windows_exporter\config.yaml"""'
+        arguments: 'EXTRA_FLAGS="--config.file ""C:\Program Files\windows_exporter\config.yaml""{{__node_exporter_web_config_flag }}"'
         state: present
       when:
         - not ansible_check_mode

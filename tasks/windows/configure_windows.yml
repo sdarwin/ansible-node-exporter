@@ -4,6 +4,11 @@
     path: "{{ _node_exporter_binary_install_dir_windows }}"
     state: directory
 
+
+- name: Set default _node_exporter_web_config
+  set_fact:
+    _node_exporter_web_config: ""
+
 - block:
     - name: Set _node_exporter_web_config
       set_fact:

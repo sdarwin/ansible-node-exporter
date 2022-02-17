@@ -35,7 +35,6 @@ node_exporter_telemetry_max_requests: 5
 node_exporter_scrape_timeout_margin: "0.5"
 node_exporter_collector_service_services_where: "Name='windows_exporter'"
 node_exporter_local_installer: ""
-_node_exporter_web_config: ""
 
 # Internal variables.
 _node_exporter_binary_install_dir: "/usr/local/bin"

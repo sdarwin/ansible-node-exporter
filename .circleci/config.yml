@@ -38,18 +38,6 @@ jobs:
               echo 'Not running latest on PR'
             else
               molecule test -s '<< parameters.scenario >>' --destroy always
-              # molecule  --debug dependency -s '<< parameters.scenario >>'
-              # molecule  --debug lint -s '<< parameters.scenario >>'
-              # molecule  --debug cleanup -s '<< parameters.scenario >>'
-              # molecule  --debug destroy -s '<< parameters.scenario >>'
-              # molecule  --debug syntax -s '<< parameters.scenario >>'
-              # molecule  --debug create -s '<< parameters.scenario >>'
-              # molecule  --debug prepare -s '<< parameters.scenario >>'
-              # molecule  --debug converge -s '<< parameters.scenario >>'
-              # molecule  --debug idempotence -s '<< parameters.scenario >>'
-              # molecule  --debug verify -s '<< parameters.scenario >>'
-              # molecule  --debug cleanup -s '<< parameters.scenario >>'
-              # molecule  --debug destroy -s '<< parameters.scenario >>'
             fi
   release:
     executor: publisher

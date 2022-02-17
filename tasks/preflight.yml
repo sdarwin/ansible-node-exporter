@@ -92,7 +92,7 @@
     - ansible_system == 'Win32NT'
 
 - name: Check if node_exporter is installed - Windows
-  ansible.windows.win_stat:
+  win_stat:
     path: '{{ _node_exporter_binary_install_dir_windows }}\windows_exporter.exe'
   register: __node_exporter_is_installed_windows
   check_mode: false
@@ -117,7 +117,7 @@
   when: ansible_system == 'Win32NT'
 
 - name: Gather currently installed node_exporter version (if any) - Windows
-  ansible.windows.win_command: '"{{ _node_exporter_binary_install_dir_windows }}\windows_exporter.exe" --version'
+  win_command: '"{{ _node_exporter_binary_install_dir_windows }}\windows_exporter.exe" --version'
   args:
     warn: false
   changed_when: false

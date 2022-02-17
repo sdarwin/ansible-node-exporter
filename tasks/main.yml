@@ -1,18 +1,18 @@
 ---
-- import_tasks: windows/preflight.yml
+- import_tasks: preflight.yml
   tags:
     - node_exporter_install
     - node_exporter_configure
     - node_exporter_run
 
-- import_tasks: windows/configure_windows.yml
+- import_tasks: configure_windows.yml
   become: true
   when:
     - ansible_system == 'Win32NT'
   tags:
     - node_exporter_configure
 
-- import_tasks: windows/install.yml
+- import_tasks: install.yml
   become: true
   when:
     ( not __node_exporter_is_installed.stat.exists ) or

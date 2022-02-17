@@ -1,20 +1,61 @@
 ---
-- name: print system
-  debug:
-    var: ansible_system
+- import_tasks: windows/preflight.yml
+  tags:
+    - node_exporter_install
+    - node_exporter_configure
+    - node_exporter_run
 
-- name: print distribution
-  debug:
-    var: ansible_distribution
+- import_tasks: windows/configure_windows.yml
+  become: true
+  when:
+    - ansible_system == 'Win32NT'
+  tags:
+    - node_exporter_configure
 
-- name: print family
-  debug:
-    var: ansible_os_family
+- import_tasks: windows/install.yml
+  become: true
+  when:
+    ( not __node_exporter_is_installed.stat.exists ) or
+    ( (__node_exporter_current_version_output.stderr_lines | length > 0) and (__node_exporter_current_version_output.stderr_lines[0].split(" ")[2] != node_exporter_version) ) or
+    ( (__node_exporter_current_version_output.stdout_lines | length > 0) and (__node_exporter_current_version_output.stdout_lines[0].split(" ")[2] != node_exporter_version) ) or
+    ( (node_exporter_binary_local_dir | length > 0) and ansible_system != 'Win32NT' ) or
+    ( (node_exporter_local_installer | length > 0) and ansible_system == 'Win32NT' )
+  tags:
+    - node_exporter_install
 
-- name: include linux tasks
-  include_tasks: main-linux.yml
-  when: ansible_system == 'Linux' or ansible_distribution == 'MacOSX'
+- import_tasks: selinux.yml
+  become: true
+  when:
+    - ansible_system == 'Linux'
+    - ansible_selinux.status == 'enabled'
+  tags:
+    - node_exporter_configure
 
-- name: include windows tasks
-  include_tasks: windows/main.yml
-  when: ansible_system == 'Win32NT'
+- import_tasks: configure.yml
+  become: true
+  when:
+    - ansible_system != 'Win32NT'
+  tags:
+    - node_exporter_configure
+#
+# - name: Ensure Node Exporter is enabled on boot
+#   become: true
+#   systemd:
+#     daemon_reload: true
+#     name: node_exporter
+#     enabled: true
+#     state: started
+#   when:
+#     - not ansible_check_mode
+#     - ansible_system == 'Linux'
+#   tags:
+#     - node_exporter_run
+#
+# - name: Ensure Node Exporter is started
+#   become: true
+#   command: |
+#     launchctl load /Library/LaunchDaemons/cloudalchemy.mxcl.node_exporter.plist
+#   changed_when: false
+#   when:
+#     - ansible_distribution == 'MacOSX'
+#

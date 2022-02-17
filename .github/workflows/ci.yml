@@ -9,81 +9,81 @@ name: ci
       - feature/*
 
 jobs:
-  # macos:
-  #   name: macos
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       include: 
-  #         - os: macos-10.15
-  #           ansible_python_interpreter: /usr/local/bin/python3
-  #       scenario:
-  #         - latest
-  #         - default
-  #         - alternative
-  #       ansible_version:
-  #         - "2.9"
-  #         - "2.10"
-  #         - "4.10"
-  #         - "5.1"
+  macos:
+    name: macos
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-10.15
+            ansible_python_interpreter: /usr/local/bin/python3
+        scenario:
+          - latest
+          - default
+          - alternative
+        ansible_version:
+          - "2.9"
+          - "2.10"
+          - "4.10"
+          - "5.1"
 
-  #   steps:
-  #     - name: Check out the codebase
-  #       uses: actions/checkout@v2
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v2
 
-  #     - name: Install ansible
-  #       run: sudo pip3 install "ansible~=${{ matrix.ansible_version }}.0"
+      - name: Install ansible
+        run: sudo pip3 install "ansible~=${{ matrix.ansible_version }}.0"
 
-  #     - name: Set up the test environment
-  #       run: |
-  #         cp tests/test-inventory ./test-inventory
-  #         cp tests/ansible.cfg ./ansible.cfg
-  #         sudo pip3 install -r test-requirements.txt
-  #         mkdir -p /Users/runner/.ansible/roles
-  #         ln -s $GITHUB_WORKSPACE /Users/runner/.ansible/roles/cloudalchemy.node_exporter
+      - name: Set up the test environment
+        run: |
+          cp tests/test-inventory ./test-inventory
+          cp tests/ansible.cfg ./ansible.cfg
+          sudo pip3 install -r test-requirements.txt
+          mkdir -p /Users/runner/.ansible/roles
+          ln -s $GITHUB_WORKSPACE /Users/runner/.ansible/roles/cloudalchemy.node_exporter
 
-  #     - name: playbook tests
-  #       run: |
-  #         if [[ -n "${{ github.event.pull_request.number }}" ]] && [[ "${{ matrix.scenario }}" == 'latest' ]]; then
-  #           echo "Not testing 'latest' and 'pull request'"
-  #         else
-  #           echo "Test the playbook's syntax"
-  #           ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
+      - name: playbook tests
+        run: |
+          if [[ -n "${{ github.event.pull_request.number }}" ]] && [[ "${{ matrix.scenario }}" == 'latest' ]]; then
+            echo "Not testing 'latest' and 'pull request'"
+          else
+            echo "Test the playbook's syntax"
+            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml --syntax-check
 
-  #           echo "Run the prepare playbook"
-  #           ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
+            echo "Run the prepare playbook"
+            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/prepare.yml
 
-  #           echo "Run the main playbook"
-  #           ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
+            echo "Run the main playbook"
+            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml
 
-  #           echo "Test the results"
-  #           ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/${{ matrix.scenario }}/macosx.yml
+            echo "Test the results"
+            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" tests/${{ matrix.scenario }}/macosx.yml
 
-  #           echo "Idempotence check"
-  #           idempotence=$(mktemp)
-  #           ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
-  #           tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
-  #         fi
-  #       env:
-  #         ANSIBLE_FORCE_COLOR: '1'
-  #         OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
+            echo "Idempotence check"
+            idempotence=$(mktemp)
+            ansible-playbook -e "ansible_python_interpreter=${{ matrix.ansible_python_interpreter }}" molecule/${{ matrix.scenario }}/playbook.yml | tee -a ${idempotence}
+            tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
+          fi
+        env:
+          ANSIBLE_FORCE_COLOR: '1'
+          OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
   windows:
     name: windows
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        include: 
+        include:
           - os: windows-2019
             # ansible_python_interpreter: C:\Python310\python.exe
+            # Tests run in WSL. This is the ansible_python_interpreter for that environment:
             ansible_python_interpreter: /usr/bin/python3
         scenario:
           - latest
           - default
           - alternative
         ansible_version:
-          # - "2.9" isn't parsing win_command quotes. Near end-of-life.
           - "2.10"
           - "4.10"
           - "5.1"
@@ -94,23 +94,12 @@ jobs:
       - name: install ssh
         run: |
           Set-PSDebug -Trace 1
-          whoami
           net user runneradmin 9!test12345678
-          $pubkey1 = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCuUVFzVArdQC4LGZkW3qRK1KzxWX3KAlfiNr2p9H1K3hT+6kktyj7+N1s3rFl7HudzHkLJ3lnz6iBaF2GDHxzSlBuLQz5ACt41tk3bHjVhT9j0/1HgpYabnNlOFRkx3bDS7mLdUIsBtGj6DpvlTvW9HD67tvQy8HkdtbybSsv/Y8yRk7SDuSoNYq9jdbk3aTNXVlXnOvk11bUAQEn4OLvh/eHCHd5XS3yVEspWAyZsbDSJs5SD30lfj94d5Z6c3LQ9/f+PbKwEV7QP0S8S9MaFN8bk7abEXjLDpOE3yPB5JY+vvmrR3YP6XZ78xqWMsiI/yGQn8+e01k1p0ObHlK5qtqLUywbnRxCzjlDDV07NjdGqyi/QFe36TOcLVpvAoGW/mjEvuHZECeo7xv/kg7oqnAhEvngplB79xZOg1jeLOXGhWupF6OFTC3xPQ/SayFfx0apXJA/44V8IGJgJrdafwb4zheFvYOHhdhyWA581Ywh4h+xA5iupwdC3xbtbLbE="
-          $keysfile = 'C:\ProgramData\ssh\administrators_authorized_keys'
+          # choco already installed:
           # iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
           choco install -y --package-parameters=/SSHServerFeature openssh
-          sleep 10
-          Add-Content $keysfile $pubkey1
-          icacls $keysfile /inheritance:d
-          icacls $keysfile /remove "Users"
-          icacls $keysfile /remove "Authenticated Users"
-
-          # trying with password instead. Disabling this line:
-          # Add-Content 'C:\ProgramData\ssh\sshd_config' "PasswordAuthentication no"
-          sleep 10
+          sleep 1
           Restart-Service -Name sshd
-          # sshd was not working. wait. What about runneradmin user.
 
       - uses: Vampire/setup-wsl@v1
         with:
@@ -123,12 +112,10 @@ jobs:
       - name: set up the test environment
         shell: wsl-bash {0}
         run: |
-          set -x
-          whoami 
+          set -xe
           mkdir -p /etc/ansible/roles
           chmod -R 755 /etc/ansible
           cp tests/test-inventory.windows /etc/ansible/hosts
-          ls -al /etc/ansible
           cp tests/ansible.cfg.windows /etc/ansible/ansible.cfg
           pip3 install "ansible~=${{ matrix.ansible_version }}.0"
           pip3 install -r tests/test-requirements.windows.txt
@@ -136,53 +123,6 @@ jobs:
           WORKSPACE_PATH=$(pwd)
           ln -s $WORKSPACE_PATH /etc/ansible/roles/cloudalchemy.node_exporter
           ls -al /etc/ansible/roles/cloudalchemy.node_exporter
-
-          privatekey1="-----BEGIN OPENSSH PRIVATE KEY-----
-          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
-          -----END OPENSSH PRIVATE KEY-----"
-
-          mkdir /root/.ssh
-          # not using. Put into .bck instead
-          echo "$privatekey1" > /root/.ssh/id_rsa.bck
-          chmod -R 700 /root/.ssh
-          echo "check one"
-          sshpass -p "9!test12345678" ssh -o StrictHostKeyChecking=no runneradmin@localhost dir
-
       - name: playbook tests
         shell: wsl-bash {0}
         run: |

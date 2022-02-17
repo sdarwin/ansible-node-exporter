@@ -6,13 +6,6 @@
     go_arch: amd64
     node_exporter_version: 1.3.1
   tasks:
-    # - name: collect facts
-    #   setup:
-    - name: Check python version
-      shell: |
-        which python3 || true
-        ls -al /usr/local/bin/py* || true
-      changed_when: false
     - name: Download node_exporter binary to local folder
       become: false
       get_url:

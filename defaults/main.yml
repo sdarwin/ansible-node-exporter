@@ -29,7 +29,7 @@ node_exporter_enabled_collectors_windows:
   - "[defaults]"
   - "memory"
 
-# Only apply to Windows, but might be added to Linux in the future.
+# Only apply to Windows. Might be added to Linux in the future.
 node_exporter_log_level: "warn"
 node_exporter_telemetry_max_requests: 5
 node_exporter_scrape_timeout_margin: "0.5"

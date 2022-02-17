@@ -1,35 +1,42 @@
 ---
-# - name: Create the node_exporter group
-#   group:
-#     name: "{{ _node_exporter_system_group }}"
-#     state: present
-#     system: true
-#   when: _node_exporter_system_group != "root"
-#
-# - name: Create the node_exporter user
-#   user:
-#     name: "{{ _node_exporter_system_user }}"
-#     groups: "{{ _node_exporter_system_group }}"
-#     append: true
-#     shell: /usr/sbin/nologin
-#     system: true
-#     create_home: false
-#     home: /
-#   when: _node_exporter_system_user != "root"
-#
-# - name: check if _node_exporter_binary_install_dir directory exists
-#   stat:
-#     path: "{{ _node_exporter_binary_install_dir }}"
-#   register: install_dir_check
-#
-# - name: Create _node_exporter_binary_install_dir
-#   file:
-#     path: "{{ _node_exporter_binary_install_dir }}"
-#     state: directory
-#     owner: root
-#     group: "{{ _node_exporter_root_group }}"
-#     mode: u+rwX,g+rwX,o=rX
-#   when: not install_dir_check.stat.exists
+- name: Create the node_exporter group
+  group:
+    name: "{{ _node_exporter_system_group }}"
+    state: present
+    system: true
+  when:
+    - ansible_system != 'Win32NT'
+    - _node_exporter_system_group != "root"
+
+- name: Create the node_exporter user
+  user:
+    name: "{{ _node_exporter_system_user }}"
+    groups: "{{ _node_exporter_system_group }}"
+    append: true
+    shell: /usr/sbin/nologin
+    system: true
+    create_home: false
+    home: /
+  when:
+    - ansible_system != 'Win32NT'
+
+- name: check if _node_exporter_binary_install_dir directory exists
+  stat:
+    path: "{{ _node_exporter_binary_install_dir }}"
+  register: install_dir_check
+  when:
+    - ansible_system != 'Win32NT'
+
+- name: Create _node_exporter_binary_install_dir
+  file:
+    path: "{{ _node_exporter_binary_install_dir }}"
+    state: directory
+    owner: root
+    group: "{{ _node_exporter_root_group }}"
+    mode: u+rwX,g+rwX,o=rX
+  when:
+    - ansible_system != 'Win32NT'
+    - not install_dir_check.stat.exists
 
 - block:
     - name: Download node_exporter binary to local folder - Windows
@@ -116,44 +123,6 @@
       # DEBUGGING:
       failed_when: false
 
-    # DEBUGGING:
-    - name: check dir
-      ansible.windows.win_command: 'dir "C:\Program Files\windows_exporter"'
-      failed_when: false
-      register: __debug1
-      when:
-        - ansible_system == 'Win32NT'
-
-    # DEBUGGING:
-    - name: debugging
-      debug:
-        var: __debug1
-
-    - name: check config
-      ansible.windows.win_command: 'cat "C:\Program Files\windows_exporter\config.yaml"'
-      failed_when: false
-      register: __debug1
-      when:
-        - ansible_system == 'Win32NT'
-
-    # DEBUGGING:
-    - name: debugging
-      debug:
-        var: __debug1
-
-        #     - name: manually run windows_explorer
-        #       ansible.windows.win_command: '""C:\Program Files\windows_exporter\windows_explorer"" --config.file ""C:\Program Files\windows_exporter\config.yaml""'
-        #       args:
-        #         warn: false
-        #       failed_when: false
-        #       register: __debug1
-        #       when:
-        #         - ansible_system == 'Win32NT'
-        #
-        #     - name: debugging
-        #       debug:
-        #         var: __debug1
-
   when:
     - node_exporter_binary_local_dir | length == 0
 
@@ -191,3 +160,23 @@
     - ansible_system != 'Win32NT'
     - node_exporter_binary_local_dir | length > 0
   notify: restart node_exporter
+
+# DEBUGGING:
+- name: check dir
+  ansible.windows.win_command: 'dir "C:\Program Files\windows_exporter"'
+  failed_when: false
+  register: __debug1
+  when:
+    - ansible_system == 'Win32NT'
+
+# DEBUGGING:
+- name: debugging
+  debug:
+    var: __debug1
+
+- name: check config
+  ansible.windows.win_command: 'cat "C:\Program Files\windows_exporter\config.yaml"'
+  failed_when: false
+  register: __debug1
+  when:
+    - ansible_system == 'Win32NT'

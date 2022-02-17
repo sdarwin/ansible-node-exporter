@@ -17,7 +17,7 @@
     owner: root
     group: "{{ _node_exporter_root_group }}"
     mode: 0644
-  notify: restart node_exporter
+  notify: restart node_exporter osx
   when:
     - ansible_distribution == 'MacOSX'
 
@@ -28,7 +28,7 @@
     owner: root
     group: "{{ _node_exporter_root_group }}"
     mode: 0755
-  notify: restart node_exporter
+  notify: restart node_exporter osx
   when:
     - ansible_distribution == 'MacOSX'
 
@@ -48,7 +48,9 @@
         owner: root
         group: "{{ _node_exporter_root_group }}"
         mode: 0644
-      notify: restart node_exporter
+      notify:
+        - restart node_exporter
+        - restart node_exporter osx
   when:
     ( node_exporter_tls_server_config | length > 0 ) or
     ( node_exporter_http_server_config | length > 0 ) or

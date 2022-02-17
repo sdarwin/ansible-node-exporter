@@ -19,6 +19,7 @@
     home: /
   when:
     - ansible_system != 'Win32NT'
+    - _node_exporter_system_user != "root"
 
 - name: check if _node_exporter_binary_install_dir directory exists
   stat:
@@ -96,7 +97,6 @@
         dest: 'C:\tmp\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi'
         mode: 0755
         owner: root
-      notify: restart node_exporter
       when:
         - not ansible_check_mode
         - ansible_system == 'Win32NT'
@@ -120,6 +120,7 @@
       when:
         - not ansible_check_mode
         - ansible_system == 'Win32NT'
+      notify: restart windows_exporter
   when:
     - node_exporter_binary_local_dir | length == 0
 

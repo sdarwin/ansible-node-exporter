@@ -152,17 +152,11 @@
 - name: "Set installer variables - Windows"
   set_fact:
     node_exporter_latest_release_api: "https://api.github.com/repos/prometheus-community/windows_exporter/releases/latest"
-    # node_exporter_releases_url: "https://github.com/prometheus-community/windows_exporter/releases"
-    # node_exporter_installer_name: "windows_exporter"
-    # node_exporter_installer_suffix: ".msi"
   when: ansible_system == 'Win32NT'
 
 - name: "Set installer variables - Linux, other"
   set_fact:
     node_exporter_latest_release_api: "https://api.github.com/repos/prometheus/node_exporter/releases/latest"
-    # node_exporter_releases_url: "https://github.com/prometheus/node_exporter/releases"
-    # node_exporter_installer_name: "node_exporter"
-    # node_exporter_installer_suffix: ".tar.gz"
   when: ansible_system != 'Win32NT'
 
 - block:

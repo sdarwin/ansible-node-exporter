@@ -7,9 +7,8 @@
   pre_tasks:
     - name: Create node_exporter cert dir
       win_file:
-        path: "{{ node_exporter_tls_server_config.cert_file | dirname }}"
+        path: "{{ node_exporter_tls_server_config.cert_file | win_dirname }}"
         state: directory
-        owner: root
       become: true
     - name: Copy cert and key
       win_copy:

@@ -187,3 +187,16 @@
 - name: debugging
   debug:
     var: __debug1
+
+- name: check web config
+  ansible.windows.win_command: 'cat "C:\Program Files\windows_exporter\web.config.yaml"'
+  failed_when: false
+  changed_when: false
+  register: __debug1
+  when:
+    - ansible_system == 'Win32NT'
+
+# DEBUGGING:
+- name: debugging
+  debug:
+    var: __debug1

@@ -15,7 +15,7 @@
         owner: root
       become: true
     - name: Copy cert and key
-      win_copy:
+      copy:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
       with_items:

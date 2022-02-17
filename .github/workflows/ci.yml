@@ -68,6 +68,7 @@ jobs:
         env:
           ANSIBLE_FORCE_COLOR: '1'
           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
+
   windows:
     name: windows
     runs-on: ${{ matrix.os }}
@@ -95,11 +96,7 @@ jobs:
         run: |
           Set-PSDebug -Trace 1
           net user runneradmin 9!test12345678
-          # choco already installed:
-          # iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
           choco install -y --package-parameters=/SSHServerFeature openssh
-          sleep 1
-          Restart-Service -Name sshd
 
       - uses: Vampire/setup-wsl@v1
         with:

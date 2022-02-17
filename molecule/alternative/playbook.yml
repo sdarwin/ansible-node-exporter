@@ -1,6 +1,6 @@
 ---
 - name: Run role
-  hosts: targetnodes
+  hosts: all
   any_errors_fatal: true
   roles:
     - cloudalchemy.node_exporter

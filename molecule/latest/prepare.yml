@@ -1,5 +1,5 @@
 ---
 - name: Prepare
-  hosts: targetnodes
+  hosts: all
   gather_facts: false
   tasks: []

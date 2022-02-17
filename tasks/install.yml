@@ -40,7 +40,7 @@
     - not install_dir_check.stat.exists
 
 - name: Make tmp dir - Windows
-  ansible.windows.win_file:
+  win_file:
     path: 'C:\tmp'
     state: directory
   when:

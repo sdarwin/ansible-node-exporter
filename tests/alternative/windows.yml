@@ -1,9 +1,9 @@
 ---
-- name: Test macos
+- name: Test windows
   hosts: localhost
   tasks:
     - name: check processes
-      shell: ps -ef | grep node || true
+      shell: ps -ef | grep exporter || true
       register: out
       changed_when: false
       failed_when: false
@@ -14,15 +14,16 @@
       changed_when: false
       failed_when: false
     - debug: var=out.stdout_lines
+
     - name: check if node_exporter is listening on port 8080 http
       command: curl -k -u randomuser:examplepassword http://localhost:8080
       register: out
       failed_when: false
     - debug: var=out.stdout_lines
     - debug: var=out.stderr_lines
+
     - name: check if node_exporter is listening on port 8080 https
       command: curl -k -u randomuser:examplepassword https://localhost:8080
       register: out
-      failed_when: false
     - debug: var=out.stdout_lines
     - debug: var=out.stderr_lines

@@ -165,6 +165,7 @@
 - name: check dir
   ansible.windows.win_command: 'dir "C:\Program Files\windows_exporter"'
   failed_when: false
+  changed_when: false
   register: __debug1
   when:
     - ansible_system == 'Win32NT'
@@ -177,6 +178,12 @@
 - name: check config
   ansible.windows.win_command: 'cat "C:\Program Files\windows_exporter\config.yaml"'
   failed_when: false
+  changed_when: false
   register: __debug1
   when:
     - ansible_system == 'Win32NT'
+
+# DEBUGGING:
+- name: debugging
+  debug:
+    var: __debug1

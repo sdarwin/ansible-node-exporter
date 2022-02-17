@@ -126,41 +126,6 @@
   when:
     - node_exporter_binary_local_dir | length == 0
 
-- name: propagate locally distributed windows installer
-  copy:
-    src: "{{ node_exporter_local_installer }}"
-    dest: 'C:\windows_exporter.msi'
-    mode: 0755
-    owner: root
-    group: "{{ _node_exporter_root_group }}"
-  when:
-    - ansible_system == 'Win32NT'
-    - node_exporter_local_installer | length > 0
-    - not ansible_check_mode
-
-- name: install locally distributed Windows exporter
-  win_package:
-    path: 'C:\windows_exporter.msi'
-    arguments: 'EXTRA_FLAGS="--config.file ""C:\Program Files\windows_exporter\config.yaml"""'
-    state: present
-  when:
-    - ansible_system == 'Win32NT'
-    - node_exporter_local_installer | length > 0
-    - not ansible_check_mode
-  notify: restart windows_exporter
-
-- name: propagate locally distributed node_exporter binary
-  copy:
-    src: "{{ node_exporter_binary_local_dir }}/node_exporter"
-    dest: "{{ _node_exporter_binary_install_dir }}/node_exporter"
-    mode: 0755
-    owner: root
-    group: "{{ _node_exporter_root_group }}"
-  when:
-    - ansible_system != 'Win32NT'
-    - node_exporter_binary_local_dir | length > 0
-  notify: restart node_exporter
-
 # DEBUGGING:
 - name: check dir
   ansible.windows.win_command: 'dir "C:\Program Files\windows_exporter"'
@@ -200,3 +165,38 @@
 - name: debugging
   debug:
     var: __debug1
+
+- name: propagate locally distributed windows installer
+  copy:
+    src: "{{ node_exporter_local_installer }}"
+    dest: 'C:\tmp\windows_exporter.msi'
+    mode: 0755
+    owner: root
+    group: "{{ _node_exporter_root_group }}"
+  when:
+    - ansible_system == 'Win32NT'
+    - node_exporter_local_installer | length > 0
+    - not ansible_check_mode
+
+- name: install locally distributed Windows exporter
+  win_package:
+    path: 'C:\tmp\windows_exporter.msi'
+    arguments: 'EXTRA_FLAGS="--config.file ""C:\Program Files\windows_exporter\config.yaml"""'
+    state: present
+  when:
+    - ansible_system == 'Win32NT'
+    - node_exporter_local_installer | length > 0
+    - not ansible_check_mode
+  notify: restart windows_exporter
+
+- name: propagate locally distributed node_exporter binary
+  copy:
+    src: "{{ node_exporter_binary_local_dir }}/node_exporter"
+    dest: "{{ _node_exporter_binary_install_dir }}/node_exporter"
+    mode: 0755
+    owner: root
+    group: "{{ _node_exporter_root_group }}"
+  when:
+    - ansible_system != 'Win32NT'
+    - node_exporter_binary_local_dir | length > 0
+  notify: restart node_exporter

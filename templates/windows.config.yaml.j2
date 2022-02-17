@@ -16,5 +16,6 @@ telemetry:
   path: "{{ node_exporter_web_telemetry_path }}"
   max-requests: "{{ node_exporter_telemetry_max_requests }}"
 web:
-  config: "{{ node_exporter_web_config }}"
+  config:
+    file: "{{ node_exporter_web_config }}"
 

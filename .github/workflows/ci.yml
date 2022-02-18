@@ -68,6 +68,7 @@ jobs:
         env:
           ANSIBLE_FORCE_COLOR: '1'
           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
+          MOLECULE_DEBUG: 'true'
 
   windows:
     name: windows

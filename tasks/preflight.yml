@@ -1,10 +1,4 @@
 ---
-- name: Set fact - node_exporter_version
-  set_fact:
-    node_exporter_version: "{{ node_exporter_version_windows }}"
-  when:
-    - ansible_system == 'Win32NT'
-
 - name: Assert usage of systemd as an init system
   assert:
     that: ansible_service_mgr == 'systemd'
@@ -149,20 +143,10 @@
     __node_exporter_current_version_output: "{{ __node_exporter_current_version_output_windows }}"
   when: ansible_system == 'Win32NT'
 
-- name: "Set installer variables - Windows"
-  set_fact:
-    node_exporter_latest_release_api: "https://api.github.com/repos/prometheus-community/windows_exporter/releases/latest"
-  when: ansible_system == 'Win32NT'
-
-- name: "Set installer variables - Linux, other"
-  set_fact:
-    node_exporter_latest_release_api: "https://api.github.com/repos/prometheus/node_exporter/releases/latest"
-  when: ansible_system != 'Win32NT'
-
 - block:
     - name: Get latest release
       uri:
-        url: "{{ node_exporter_latest_release_api }}"
+        url: "https://api.github.com/repos/prometheus/node_exporter/releases/latest"
         method: GET
         return_content: true
         status_code: 200
@@ -175,12 +159,39 @@
       retries: 200
       delay: 30
 
-    - name: "Set node_exporter version to {{ _latest_release.json.tag_name[1:] }}"
+    - name: "Set node_exporter_version to {{ _latest_release.json.tag_name[1:] }}"
       set_fact:
         node_exporter_version: "{{ _latest_release.json.tag_name[1:] }}"
   when:
     - node_exporter_version == "latest"
     - node_exporter_binary_local_dir | length == 0
+    - ansible_system != 'Win32NT'
+  delegate_to: localhost
+  run_once: true
+
+- block:
+    - name: Get latest release - Windows
+      uri:
+        url: "https://api.github.com/repos/prometheus-community/windows_exporter/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        user: "{{ lookup('env', 'GH_USER') | default(omit) }}"
+        password: "{{ lookup('env', 'GH_TOKEN') | default(omit) }}"
+      no_log: "{{ not lookup('env', 'MOLECULE_DEBUG') | bool }}"
+      register: _latest_release_windows
+      until: _latest_release_windows.status == 200
+      retries: 200
+      delay: 30
+
+    - name: "Set node_exporter_version_windows to {{ _latest_release_windows.json.tag_name[1:] }}"
+      set_fact:
+        node_exporter_version_windows: "{{ _latest_release_windows.json.tag_name[1:] }}"
+  when:
+    - node_exporter_version_windows == "latest"
+    - node_exporter_binary_local_dir | length == 0
+    - ansible_system == 'Win32NT'
   delegate_to: localhost
   run_once: true
 

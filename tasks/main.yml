@@ -15,11 +15,23 @@
 - import_tasks: install.yml
   become: true
   when:
-    ( not __node_exporter_is_installed.stat.exists ) or
+    ( ( not __node_exporter_is_installed.stat.exists ) or
     ( (__node_exporter_current_version_output.stderr_lines | length > 0) and (__node_exporter_current_version_output.stderr_lines[0].split(" ")[2] != node_exporter_version) ) or
     ( (__node_exporter_current_version_output.stdout_lines | length > 0) and (__node_exporter_current_version_output.stdout_lines[0].split(" ")[2] != node_exporter_version) ) or
-    ( (node_exporter_binary_local_dir | length > 0) and ansible_system != 'Win32NT' ) or
-    ( (node_exporter_local_installer | length > 0) and ansible_system == 'Win32NT' )
+    ( node_exporter_binary_local_dir | length > 0 ) ) and
+    ansible_system != 'Win32NT'
+  tags:
+    - node_exporter_install
+
+# Windows import:
+- import_tasks: install.yml
+  become: true
+  when:
+    ( ( not __node_exporter_is_installed.stat.exists ) or
+    ( (__node_exporter_current_version_output.stderr_lines | length > 0) and (__node_exporter_current_version_output.stderr_lines[0].split(" ")[2] != node_exporter_version_windows) ) or
+    ( (__node_exporter_current_version_output.stdout_lines | length > 0) and (__node_exporter_current_version_output.stdout_lines[0].split(" ")[2] != node_exporter_version_windows) ) or
+    ( node_exporter_binary_local_dir | length > 0 ) ) and
+    ansible_system == 'Win32NT'
   tags:
     - node_exporter_install
 

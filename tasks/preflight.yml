@@ -165,7 +165,6 @@
   when:
     - node_exporter_version == "latest"
     - node_exporter_binary_local_dir | length == 0
-    - ansible_system != 'Win32NT'
   delegate_to: localhost
   run_once: true
 
@@ -191,7 +190,6 @@
   when:
     - node_exporter_version_windows == "latest"
     - node_exporter_binary_local_dir | length == 0
-    - ansible_system == 'Win32NT'
   delegate_to: localhost
   run_once: true
 

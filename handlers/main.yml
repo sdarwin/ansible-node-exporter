@@ -25,4 +25,4 @@
     state: restarted
   when:
     - not ansible_check_mode
-    - ansible_distribution == 'Win32NT'
+    - ansible_system == 'Win32NT'

@@ -147,6 +147,15 @@
     - not ansible_check_mode
   notify: restart windows_exporter
 
+# Need to test. Any bugs?
+- name: set service delayed startup to assist in startup after a reboot
+  ansible.windows.win_shell: sc.exe config windows_exporter start=delayed-auto
+  when:
+    - ansible_system == 'Win32NT'
+    - node_exporter_local_installer | length > 0
+    - not ansible_check_mode
+  notify: restart windows_exporter
+
 - name: propagate locally distributed node_exporter binary
   copy:
     src: "{{ node_exporter_binary_local_dir }}/node_exporter"

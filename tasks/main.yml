@@ -1,4 +1,9 @@
 ---
+- import_tasks: client_freebsd.yml
+  become: true
+  when:
+    - ansible_system == 'FreeBSD'
+
 - import_tasks: preflight.yml
   tags:
     - node_exporter_install

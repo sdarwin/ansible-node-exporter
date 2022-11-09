@@ -4,6 +4,12 @@
   when:
     - ansible_system == 'FreeBSD'
 
+- import_tasks: client_macos_m1.yml
+  become: true
+  when:
+    - ansible_distribution == 'MacOSX'
+    - ansible_architecture == 'arm64'
+
 - import_tasks: preflight.yml
   tags:
     - node_exporter_install

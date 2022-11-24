@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - feature/*
 
 jobs:
   lint:
@@ -31,7 +32,15 @@ jobs:
     runs-on: macos-12
     strategy:
       fail-fast: false
-
+      matrix:
+        ansible_version:
+                - 2.10.7
+                - 4.10.0
+                - 5.1.0
+                - 5.2.0
+                - 5.4.0
+                - 5.10.0
+                - 6.1.0
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v2
@@ -42,7 +51,9 @@ jobs:
           python-version: '3.x'
 
       - name: Install ansible
-        run: pip3 install ansible molecule
+        run: |
+          pip3 install ansible==${{matrix.ansible_version}}
+          pip3 install molecule
 
       - name: Set up the test environment
         run: |

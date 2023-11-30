@@ -28,6 +28,9 @@
     mode: 0644
   notify: restart node_exporter osx homebrew
 
+- name: Flush handlers
+  meta: flush_handlers
+
 - name: End the play for hosts that run macOS arm64
   ansible.builtin.meta: end_host
   when:

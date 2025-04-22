@@ -194,6 +194,11 @@
   run_once: true
 
 - block:
+    - name: Set fact ansible_system_lower
+      set_fact:
+         ansible_system_lower: "{{ ansible_system | lower }}"
+      run_once: true
+
     - name: Get checksum list from github
       set_fact:
         _checksums: "{{ lookup('url', 'https://github.com/prometheus/node_exporter/releases' + '/download/v' + node_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
@@ -209,7 +214,7 @@
         node_exporter_checksum: "{{ item.split(' ')[0] }}"
       with_items: "{{ _checksums }}"
       when:
-        - ( "{{ ansible_system |lower }}" + "-" + go_arch + '.tar.gz') in item
+        - ( ansible_system_lower + "-" + go_arch + ".tar.gz" ) in item
 
     - name: "Get checksum for {{ go_arch }} architecture - Windows"
       set_fact:
@@ -219,3 +224,6 @@
         - ( "-" + go_arch + '.msi') in item
   delegate_to: localhost
   when: node_exporter_binary_local_dir | length == 0
+
+  # Notes:
+  # - ( "{{ ansible_system |lower }}" + "-" + go_arch + '.tar.gz') in item

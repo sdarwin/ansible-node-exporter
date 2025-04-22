@@ -6,13 +6,13 @@
     - cloudalchemy.node_exporter
   pre_tasks:
     - name: Create node_exporter cert dir
-      file:
+      ansible.builtin.file:
         path: "{{ node_exporter_tls_server_config.cert_file | dirname }}"
         state: directory
         owner: root
       become: true
     - name: Copy cert and key
-      copy:
+      ansible.builtin.copy:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
       with_items:

@@ -6,12 +6,12 @@
     - cloudalchemy.node_exporter
   pre_tasks:
     - name: Create node_exporter cert dir
-      win_file:
+      ansible.windows.win_file:
         path: "{{ node_exporter_tls_server_config.cert_file | win_dirname }}"
         state: directory
       become: true
     - name: Copy cert and key
-      win_copy:
+      ansible.windows.win_copy:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
       with_items:
@@ -32,8 +32,8 @@
     #   - diskstats
 
     node_exporter_tls_server_config:
-      cert_file: '{{ _node_exporter_binary_install_dir_windows }}\tls.cert'
-      key_file: '{{ _node_exporter_binary_install_dir_windows }}\tls.key'
+      cert_file: '{{ node_exporter_binary_install_dir_windows }}\tls.cert'
+      key_file: '{{ node_exporter_binary_install_dir_windows }}\tls.key'
     node_exporter_http_server_config:
       http2: true
     node_exporter_basic_auth_users:

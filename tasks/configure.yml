@@ -1,73 +1,81 @@
 ---
 - name: Copy the node_exporter systemd service file
-  template:
+  become: true
+  ansible.builtin.template:
     src: node_exporter.service.j2
     dest: /etc/systemd/system/node_exporter.service
     owner: root
     group: root
-    mode: 0644
-  notify: restart node_exporter
+    mode: "0644"
+  notify: Restart node_exporter
   when:
     - ansible_system == 'Linux'
 
 - name: Copy the node_exporter launchd service file
-  template:
+  become: true
+  ansible.builtin.template:
     src: cloudalchemy.mxcl.node_exporter.plist.j2
     dest: /Library/LaunchDaemons/cloudalchemy.mxcl.node_exporter.plist
     owner: root
-    group: "{{ _node_exporter_root_group }}"
-    mode: 0644
-  notify: restart node_exporter osx
+    group: "{{ node_exporter_root_group }}"
+    mode: "0644"
+  notify: Restart node_exporter osx
   when:
     - ansible_distribution == 'MacOSX'
 
 - name: Copy the node_exporter startup script
-  template:
+  become: true
+  ansible.builtin.template:
     src: node_exporter_cloudalchemy_services.j2
-    dest: "{{ _node_exporter_binary_install_dir }}/node_exporter_cloudalchemy_services"
+    dest: "{{ node_exporter_binary_install_dir }}/node_exporter_cloudalchemy_services"
     owner: root
-    group: "{{ _node_exporter_root_group }}"
-    mode: 0755
-  notify: restart node_exporter osx
+    group: "{{ node_exporter_root_group }}"
+    mode: "0755"
+  notify: Restart node_exporter osx
   when:
     - ansible_distribution == 'MacOSX'
 
-- block:
-    - name: Create node_exporter config directory
-      file:
-        path: "/etc/node_exporter"
-        state: directory
-        owner: root
-        group: "{{ _node_exporter_root_group }}"
-        mode: u+rwX,g+rwX,o=rX
-
-    - name: Copy the node_exporter config file
-      template:
-        src: config.yaml.j2
-        dest: /etc/node_exporter/config.yaml
-        owner: root
-        group: "{{ _node_exporter_root_group }}"
-        mode: 0644
-      notify:
-        - restart node_exporter
-        - restart node_exporter osx
+- name: A configure block
   when:
     ( node_exporter_tls_server_config | length > 0 ) or
     ( node_exporter_http_server_config | length > 0 ) or
     ( node_exporter_basic_auth_users | length > 0 )
+  block:
+    - name: Create node_exporter config directory
+      become: true
+      ansible.builtin.file:
+        path: "/etc/node_exporter"
+        state: directory
+        owner: root
+        group: "{{ node_exporter_root_group }}"
+        mode: u+rwX,g+rwX,o=rX
+
+    - name: Copy the node_exporter config file
+      become: true
+      ansible.builtin.template:
+        src: web_config.yml.j2
+        dest: /etc/node_exporter/web_config.yml
+        owner: root
+        group: "{{ node_exporter_root_group }}"
+        mode: "0644"
+      notify:
+        - Restart node_exporter
+        - Restart node_exporter osx
 
 - name: Create textfile collector dir
-  file:
+  ansible.builtin.file:
     path: "{{ node_exporter_textfile_dir }}"
     state: directory
-    owner: "{{ _node_exporter_system_user }}"
-    group: "{{ _node_exporter_system_group }}"
+    owner: "{{ node_exporter_system_user }}"
+    group: "{{ node_exporter_system_group }}"
     recurse: true
     mode: u+rwX,g+rwX,o=rX
+  become: true
   when: node_exporter_textfile_dir | length > 0
 
 - name: Allow node_exporter port in SELinux on RedHat OS family
-  seport:
+  become: true
+  community.general.seport:
     ports: "{{ node_exporter_web_listen_address.split(':')[-1] }}"
     proto: tcp
     setype: http_port_t

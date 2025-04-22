@@ -1,6 +1,7 @@
 ---
 - name: Check if brew is installed
-  shell: |
+  become: true
+  ansible.builtin.shell: |
     export PATH=/usr/local/bin:/opt/homebrew/bin:$PATH
     command -v brew
   args:
@@ -10,8 +11,9 @@
   changed_when: false
 
 - name: Install brew
-  command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  ansible.builtin.command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
   when: does_brew_exist.rc
+  changed_when: false
 
 - name: Install node_exporter
   community.general.homebrew:
@@ -20,18 +22,21 @@
   become: false
 
 - name: Copy the node_exporter launchd service file
-  template:
+  become: true
+  ansible.builtin.template:
     src: homebrew.mxcl.node_exporter.plist
     dest: /Library/LaunchDaemons/homebrew.mxcl.node_exporter.plist
     owner: root
-    group: "{{ _node_exporter_root_group }}"
-    mode: 0644
-  notify: restart node_exporter osx homebrew
+    group: "{{ node_exporter_root_group }}"
+    mode: "0644"
+  notify: Restart node_exporter osx homebrew
 
 - name: Flush handlers
-  meta: flush_handlers
+  become: true
+  ansible.builtin.meta: flush_handlers
 
 - name: End the play for hosts that run macOS arm64
+  become: true
   ansible.builtin.meta: end_host
   when:
     - ansible_distribution == 'MacOSX'

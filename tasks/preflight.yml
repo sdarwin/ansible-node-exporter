@@ -1,13 +1,13 @@
 ---
 - name: Assert usage of systemd as an init system
-  assert:
+  ansible.builtin.assert:
     that: ansible_service_mgr == 'systemd'
     msg: "This role only works with systemd"
   when:
     - ansible_system == 'Linux'
 
 - name: Get systemd version
-  command: systemctl --version
+  ansible.builtin.command: systemctl --version
   changed_when: false
   check_mode: false
   register: __systemd_version
@@ -17,77 +17,85 @@
     - ansible_system == 'Linux'
 
 - name: Set systemd version fact
-  set_fact:
+  ansible.builtin.set_fact:
     node_exporter_systemd_version: "{{ __systemd_version.stdout_lines[0] | regex_replace('^systemd\\s(\\d+).*$', '\\1') }}"
   when:
     - ansible_system == 'Linux'
 
-- name: Naive assertion of proper listen address
-  assert:
+- name: Assert that used version supports listen address type
+  ansible.builtin.assert:
     that:
-      - "':' in node_exporter_web_listen_address"
+      - >-
+        node_exporter_web_listen_address is string
+        or
+        (
+          node_exporter_version is version('1.5.0', '>=') and
+          node_exporter_web_listen_address | type_debug == "list"
+        )
 
 - name: Assert collectors are not both disabled and enabled at the same time
-  assert:
+  ansible.builtin.assert:
     that:
       - "item not in node_exporter_enabled_collectors"
   with_items: "{{ node_exporter_disabled_collectors }}"
 
-- block:
-    - name: Assert that TLS key and cert path are set
-      assert:
-        that:
-          - "node_exporter_tls_server_config.cert_file is defined"
-          - "node_exporter_tls_server_config.key_file is defined"
-
-    - name: Check existence of TLS cert file
-      stat:
-        path: "{{ node_exporter_tls_server_config.cert_file }}"
-      register: __node_exporter_cert_file
-
-    - name: Check existence of TLS key file
-      stat:
-        path: "{{ node_exporter_tls_server_config.key_file }}"
-      register: __node_exporter_key_file
-
-    - name: Assert that TLS key and cert are present
-      assert:
-        that:
-          - "{{ __node_exporter_cert_file.stat.exists }}"
-          - "{{ __node_exporter_key_file.stat.exists }}"
+- name: Assert that TLS config is correct
   when:
     - node_exporter_tls_server_config | length > 0
     - ansible_system != 'Win32NT'
-
-- block:
+  block:
     - name: Assert that TLS key and cert path are set
-      assert:
+      ansible.builtin.assert:
         that:
           - "node_exporter_tls_server_config.cert_file is defined"
           - "node_exporter_tls_server_config.key_file is defined"
 
     - name: Check existence of TLS cert file
-      win_stat:
+      ansible.builtin.stat:
         path: "{{ node_exporter_tls_server_config.cert_file }}"
       register: __node_exporter_cert_file
 
     - name: Check existence of TLS key file
-      win_stat:
+      ansible.builtin.stat:
         path: "{{ node_exporter_tls_server_config.key_file }}"
       register: __node_exporter_key_file
 
     - name: Assert that TLS key and cert are present
-      assert:
+      ansible.builtin.assert:
         that:
-          - "{{ __node_exporter_cert_file.stat.exists }}"
-          - "{{ __node_exporter_key_file.stat.exists }}"
+          - "__node_exporter_cert_file.stat.exists"
+          - "__node_exporter_key_file.stat.exists"
+
+- name: A windows block
   when:
     - node_exporter_tls_server_config | length > 0
     - ansible_system == 'Win32NT'
+  block:
+    - name: Assert that TLS key and cert path are set
+      ansible.builtin.assert:
+        that:
+          - "node_exporter_tls_server_config.cert_file is defined"
+          - "node_exporter_tls_server_config.key_file is defined"
+
+    - name: Check existence of TLS cert file
+      ansible.windows.win_stat:
+        path: "{{ node_exporter_tls_server_config.cert_file }}"
+      register: __node_exporter_cert_file
+
+    - name: Check existence of TLS key file
+      ansible.windows.win_stat:
+        path: "{{ node_exporter_tls_server_config.key_file }}"
+      register: __node_exporter_key_file
+
+    - name: Assert that TLS key and cert are present
+      ansible.builtin.assert:
+        that:
+          - "{{ __node_exporter_cert_file.stat.exists }}"
+          - "{{ __node_exporter_key_file.stat.exists }}"
 
 - name: Check if node_exporter is installed - Windows
-  win_stat:
-    path: '{{ _node_exporter_binary_install_dir_windows }}\windows_exporter.exe'
+  ansible.windows.win_stat:
+    path: "{{ node_exporter_binary_install_dir_windows }}\\windows_exporter.exe"
   register: __node_exporter_is_installed_windows
   check_mode: false
   tags:
@@ -96,8 +104,8 @@
     - ansible_system == 'Win32NT'
 
 - name: Check if node_exporter is installed - Linux
-  stat:
-    path: "{{ _node_exporter_binary_install_dir }}/node_exporter"
+  ansible.builtin.stat:
+    path: "{{ node_exporter_binary_install_dir }}/node_exporter"
   register: __node_exporter_is_installed
   check_mode: false
   tags:
@@ -106,12 +114,12 @@
     - ansible_system != 'Win32NT'
 
 - name: Set fact __node_exporter_is_installed
-  set_fact:
+  ansible.builtin.set_fact:
     __node_exporter_is_installed: "{{ __node_exporter_is_installed_windows }}"
   when: ansible_system == 'Win32NT'
 
 - name: Gather currently installed node_exporter version (if any) - Windows
-  win_command: '"{{ _node_exporter_binary_install_dir_windows }}\windows_exporter.exe" --version'
+  ansible.windows.win_command: '"{{ node_exporter_binary_install_dir_windows }}\windows_exporter.exe" --version'
   # args:
   #  warn: false
   changed_when: false
@@ -125,7 +133,7 @@
     - skip_ansible_lint
 
 - name: Gather currently installed node_exporter version (if any)
-  command: "{{ _node_exporter_binary_install_dir }}/node_exporter --version"
+  ansible.builtin.command: "{{ node_exporter_binary_install_dir }}/node_exporter --version"
   # args:
   #  warn: false
   changed_when: false
@@ -139,13 +147,19 @@
     - skip_ansible_lint
 
 - name: Set fact __node_exporter_current_version_output
-  set_fact:
+  ansible.builtin.set_fact:
     __node_exporter_current_version_output: "{{ __node_exporter_current_version_output_windows }}"
   when: ansible_system == 'Win32NT'
 
-- block:
+- name: A preflight block
+  when:
+    - node_exporter_version == "latest"
+    - node_exporter_binary_local_dir | length == 0
+  delegate_to: localhost
+  run_once: true
+  block:
     - name: Get latest release
-      uri:
+      ansible.builtin.uri:
         url: "https://api.github.com/repos/prometheus/node_exporter/releases/latest"
         method: GET
         return_content: true
@@ -160,17 +174,18 @@
       delay: 30
 
     - name: "Set node_exporter_version to {{ _latest_release.json.tag_name[1:] }}"
-      set_fact:
+      ansible.builtin.set_fact:
         node_exporter_version: "{{ _latest_release.json.tag_name[1:] }}"
+
+- name: Another preflight block
   when:
-    - node_exporter_version == "latest"
+    - node_exporter_version_windows == "latest"
     - node_exporter_binary_local_dir | length == 0
   delegate_to: localhost
   run_once: true
-
-- block:
+  block:
     - name: Get latest release - Windows
-      uri:
+      ansible.builtin.uri:
         url: "https://api.github.com/repos/prometheus-community/windows_exporter/releases/latest"
         method: GET
         return_content: true
@@ -185,37 +200,34 @@
       delay: 30
 
     - name: "Set node_exporter_version_windows to {{ _latest_release_windows.json.tag_name[1:] }}"
-      set_fact:
+      ansible.builtin.set_fact:
         node_exporter_version_windows: "{{ _latest_release_windows.json.tag_name[1:] }}"
-  when:
-    - node_exporter_version_windows == "latest"
-    - node_exporter_binary_local_dir | length == 0
+- name: A preflight block
   delegate_to: localhost
-  run_once: true
-
-- block:
+  when: node_exporter_binary_local_dir | length == 0
+  block:
     - name: Get checksum list from github
-      set_fact:
-        _checksums: "{{ lookup('url', 'https://github.com/prometheus/node_exporter/releases' + '/download/v' + node_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
+      ansible.builtin.set_fact:
+        _checksums: "{{ lookup('url', 'https://github.com/prometheus/node_exporter/releases' + '/download/v' + node_exporter_version + '/sha256sums.txt', wantlist=True)
+          | list }}"
       run_once: true
 
     - name: Get checksum list from github - windows
-      set_fact:
-        _checksums_windows: "{{ lookup('url', 'https://github.com/prometheus-community/windows_exporter/releases' + '/download/v' + node_exporter_version_windows + '/sha256sums.txt', wantlist=True) | list }}"
+      ansible.builtin.set_fact:
+        _checksums_windows: "{{ lookup('url', 'https://github.com/prometheus-community/windows_exporter/releases' + '/download/v' + node_exporter_version_windows
+          + '/sha256sums.txt', wantlist=True) | list }}"
       run_once: true
 
-    - name: "Get checksum for {{ go_arch }} architecture - Linux"
-      set_fact:
+    - name: Get checksum for go_arch architecture - Linux  # noqa no-jinja-when
+      ansible.builtin.set_fact:
         node_exporter_checksum: "{{ item.split(' ')[0] }}"
       with_items: "{{ _checksums }}"
       when:
-        - ( "{{ ansible_system |lower }}" + "-" + go_arch + '.tar.gz') in item
+        - ( "{{ ansible_system | lower }}" + "-" + go_arch + '.tar.gz') in item
 
-    - name: "Get checksum for {{ go_arch }} architecture - Windows"
-      set_fact:
+    - name: Get checksum for go_arch architecture - Windows
+      ansible.builtin.set_fact:
         node_exporter_checksum_windows: "{{ item.split(' ')[0] }}"
       with_items: "{{ _checksums_windows }}"
       when:
         - ( "-" + go_arch + '.msi') in item
-  delegate_to: localhost
-  when: node_exporter_binary_local_dir | length == 0

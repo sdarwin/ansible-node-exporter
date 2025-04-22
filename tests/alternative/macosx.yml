@@ -2,22 +2,35 @@
 - name: Test macos
   hosts: localhost
   tasks:
-    - name: check processes
-      shell: ps -ef | grep node || true
+    - name: Check processes
+      ansible.builtin.shell: |
+         set -o pipefail
+         ps -ef | grep node || true
       register: out
       changed_when: false
       failed_when: false
-    - debug: var=out.stdout_lines
+    - name: Debug stdout
+      ansible.builtin.debug:
+        var: out.stdout_lines
 
-    - name: check ports
-      shell: netstat -anvp tcp | awk 'NR<3 || /LISTEN/'
+    - name: Check ports
+      ansible.builtin.shell: |
+        set -o pipefail
+        netstat -anvp tcp | awk 'NR<3 || /LISTEN/'
       register: out
       changed_when: false
       failed_when: false
-    - debug: var=out.stdout_lines
+    - name: Debug stdout
+      ansible.builtin.debug:
+        var: out.stdout_lines
 
-    - name: check if node_exporter is listening on port 8080
-      command: curl -k -u randomuser:examplepassword https://localhost:8080
+    - name: Check if node_exporter is listening on port 8080  # noqa command-instead-of-module
+      ansible.builtin.command: curl -k -u randomuser:examplepassword https://localhost:8080
+      changed_when: false
       register: out
-    - debug: var=out.stdout_lines
-    - debug: var=out.stderr_lines
+    - name: Debug stdout
+      ansible.builtin.debug:
+        var: out.stdout_lines
+    - name: Debug stderr
+      ansible.builtin.debug:
+        var: out.stderr_lines

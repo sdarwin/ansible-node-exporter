@@ -1,5 +1,5 @@
 #!/bin/bash
-exec su -m {{ _node_exporter_system_user }} -c "{{ _node_exporter_binary_install_dir }}/node_exporter \
+exec su -m {{ node_exporter_system_user }} -c "{{ node_exporter_binary_install_dir }}/node_exporter \
 {% for collector in node_exporter_enabled_collectors -%}
 {% if not collector == 'systemd' %}
 {% if not collector is mapping %}
@@ -17,7 +17,7 @@ exec su -m {{ _node_exporter_system_user }} -c "{{ _node_exporter_binary_install
     --no-collector.{{ collector }} \
 {% endfor %}
 {% if node_exporter_tls_server_config | length > 0 or node_exporter_http_server_config | length > 0 or node_exporter_basic_auth_users | length > 0 %}
-    --web.config=/etc/node_exporter/config.yaml \
+    --web.config=/etc/node_exporter/web_config.yml \
 {% endif %}
     --web.listen-address={{ node_exporter_web_listen_address }} \
     --web.telemetry-path={{ node_exporter_web_telemetry_path }}"

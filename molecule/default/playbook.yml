@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: A playbook
+  hosts: all
   any_errors_fatal: true
   roles:
     - cloudalchemy.node_exporter

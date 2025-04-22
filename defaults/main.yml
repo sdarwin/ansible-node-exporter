@@ -1,7 +1,6 @@
 ---
-node_exporter_version: 1.6.1
-# node_exporter_version: 1.1.2
-node_exporter_version_windows: 0.18.1
+node_exporter_version: 1.9.1
+node_exporter_version_windows: 0.30.6
 node_exporter_binary_local_dir: ""
 node_exporter_web_listen_address: "0.0.0.0:9100"
 node_exporter_web_telemetry_path: "/metrics"
@@ -36,9 +35,9 @@ node_exporter_scrape_timeout_margin: "0.5"
 node_exporter_collector_service_services_where: "Name='windows_exporter'"
 node_exporter_local_installer: ""
 
-# Internal variables.
-_node_exporter_binary_install_dir: "/usr/local/bin"
-_node_exporter_binary_install_dir_windows: 'C:\Program Files\windows_exporter'
-_node_exporter_system_group: "node-exp"
-_node_exporter_system_user: "{{ _node_exporter_system_group }}"
-_node_exporter_root_group: "{% if ansible_distribution == 'MacOSX' %}wheel{% else %}root{% endif %}"
+node_exporter_binary_install_dir: "/usr/local/bin"
+node_exporter_binary_install_dir_windows: 'C:\Program Files\windows_exporter'
+node_exporter_system_group: "node-exp"
+node_exporter_system_user: "{{ node_exporter_system_group }}"
+node_exporter_config_dir: "/etc/node_exporter"
+node_exporter_root_group: "{% if ansible_distribution == 'MacOSX' %}wheel{% else %}root{% endif %}"

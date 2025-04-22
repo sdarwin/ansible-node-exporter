@@ -1,7 +1,7 @@
 ---
-- name: restart node_exporter
+- name: Restart node_exporter
   become: true
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: true
     name: node_exporter
     state: restarted
@@ -9,28 +9,30 @@
     - not ansible_check_mode
     - ansible_system == 'Linux'
 
-- name: restart node_exporter osx
-  shell: |
+- name: Restart node_exporter osx
+  ansible.builtin.shell: |
     /bin/launchctl unload /Library/LaunchDaemons/cloudalchemy.mxcl.node_exporter.plist
     /usr/bin/pkill node_exporter
     /bin/launchctl load /Library/LaunchDaemons/cloudalchemy.mxcl.node_exporter.plist
   become: true
+  changed_when: false
   when:
     - not ansible_check_mode
     - ansible_distribution == 'MacOSX'
 
-- name: restart node_exporter osx homebrew
-  shell: |
+- name: Restart node_exporter osx homebrew
+  ansible.builtin.shell: |
     /bin/launchctl unload /Library/LaunchDaemons/homebrew.mxcl.node_exporter.plist
     /usr/bin/pkill node_exporter
     /bin/launchctl load /Library/LaunchDaemons/homebrew.mxcl.node_exporter.plist
   become: true
+  changed_when: false
   when:
     - not ansible_check_mode
     - ansible_distribution == 'MacOSX'
 
-- name: restart windows_exporter
-  win_service:
+- name: Restart windows_exporter
+  ansible.windows.win_service:
     name: windows_exporter
     state: restarted
   when:

@@ -2,5 +2,6 @@
 - name: Test macos
   hosts: localhost
   tasks:
-  - name: check if node_exporter is running on port 9100
-    command: curl http://localhost:9100
+    - name: Check if node_exporter is running on port 9100  # noqa command-instead-of-module
+      ansible.builtin.command: curl http://localhost:9100
+      changed_when: false

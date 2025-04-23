@@ -123,15 +123,17 @@
         - not ansible_check_mode
         - ansible_system != 'Win32NT'
 
+    # 2025: the arguments have changed since the last time.
     - name: Install Windows exporter
       ansible.windows.win_package:
         path: "C:\\tmp\\windows_exporter-{{ node_exporter_version_windows }}-{{ go_arch }}.msi"
-        arguments: 'EXTRA_FLAGS="--config.file ""C:\Program Files\windows_exporter\config.yaml"""'
+        arguments: 'LISTEN_PORT=9100 ADDLOCAL=FirewallException CONFIG_FILE="C:\Program Files\windows_exporter\config.yaml"'
         state: present
       when:
         - not ansible_check_mode
         - ansible_system == 'Win32NT'
       notify: Restart windows_exporter
+
 - name: Propagate locally distributed windows installer
   ansible.builtin.copy:
     src: "{{ node_exporter_local_installer }}"

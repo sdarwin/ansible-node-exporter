@@ -2,6 +2,7 @@
 
 # Installation on FreeBSD is currently much simpler than the other operating systems.
 # Could potentially be expanded later if necessary.
+# Since it's a package install the version is not closely controlled.
 
 - name: Install packages
   become: true

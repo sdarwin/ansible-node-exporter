@@ -1,0 +1,7 @@
+---
+- name: Deploy node_exporter
+  hosts: newservers
+  roles:
+    - sdarwin.node_exporter
+  tags:
+    - node_exporter

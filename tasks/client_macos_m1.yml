@@ -11,7 +11,10 @@
   changed_when: false
 
 - name: Install brew
-  ansible.builtin.command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  ansible.builtin.shell: |
+      # install.sh seems to be prompting for a sudo check. Set CI=1 (or other settings) to skip.
+      export CI=1
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
   when: does_brew_exist.rc
   changed_when: false
 

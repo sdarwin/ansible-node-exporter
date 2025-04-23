@@ -218,12 +218,17 @@
           + '/sha256sums.txt', wantlist=True) | list }}"
       run_once: true
 
-    - name: Get checksum for go_arch architecture - Linux  # noqa no-jinja-when
+    - name: Set fact ansible_system_lower
+      set_fact:
+         ansible_system_lower: "{{ ansible_system | lower }}"
+      run_once: true
+
+    - name: Get checksum for go_arch architecture - Linux
       ansible.builtin.set_fact:
         node_exporter_checksum: "{{ item.split(' ')[0] }}"
       with_items: "{{ _checksums }}"
       when:
-        - ( "{{ ansible_system | lower }}" + "-" + go_arch + '.tar.gz') in item
+        - ( ansible_system_lower + "-" + go_arch + '.tar.gz') in item
 
     - name: Get checksum for go_arch architecture - Windows
       ansible.builtin.set_fact:

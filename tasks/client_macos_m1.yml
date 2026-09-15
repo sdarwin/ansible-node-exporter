@@ -11,6 +11,10 @@
   changed_when: false
 
 - name: Install brew
+  become: true
+  become_user: administrator
+  environment:
+    NONINTERACTIVE: "1"
   ansible.builtin.shell: |
       # install.sh seems to be prompting for a sudo check. Set CI=1 (or other settings) to skip.
       export CI=1
@@ -22,7 +26,8 @@
   community.general.homebrew:
     name: node_exporter
     state: present
-  become: false
+  become: true
+  become_user: administrator
 
 - name: Copy the node_exporter launchd service file
   become: true

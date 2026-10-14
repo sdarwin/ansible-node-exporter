@@ -40,4 +40,4 @@ node_exporter_binary_install_dir_windows: 'C:\Program Files\windows_exporter'
 node_exporter_system_group: "node-exp"
 node_exporter_system_user: "{{ node_exporter_system_group }}"
 node_exporter_config_dir: "/etc/node_exporter"
-node_exporter_root_group: "{% if ansible_distribution == 'MacOSX' %}wheel{% else %}root{% endif %}"
+node_exporter_root_group: "{% if ansible_facts['distribution'] == 'MacOSX' %}wheel{% else %}root{% endif %}"

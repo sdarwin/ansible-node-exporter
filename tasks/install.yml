@@ -6,7 +6,7 @@
     state: present
     system: true
   when:
-    - ansible_system != 'Win32NT'
+    - ansible_facts['system'] != 'Win32NT'
     - node_exporter_system_group != "root"
 
 - name: Create the node_exporter user
@@ -20,7 +20,7 @@
     create_home: false
     home: /
   when:
-    - ansible_system != 'Win32NT'
+    - ansible_facts['system'] != 'Win32NT'
     - node_exporter_system_user != "root"
 
 - name: Check if node_exporter_binary_install_dir directory exists
@@ -29,7 +29,7 @@
     path: "{{ node_exporter_binary_install_dir }}"
   register: install_dir_check
   when:
-    - ansible_system != 'Win32NT'
+    - ansible_facts['system'] != 'Win32NT'
 
 - name: Create node_exporter_binary_install_dir
   become: true
@@ -40,7 +40,7 @@
     group: "{{ node_exporter_root_group }}"
     mode: u+rwX,g+rwX,o=rX
   when:
-    - ansible_system != 'Win32NT'
+    - ansible_facts['system'] != 'Win32NT'
     - not install_dir_check.stat.exists
 
 - name: Make tmp dir - Windows
@@ -50,7 +50,7 @@
     state: directory
   when:
     - not ansible_check_mode
-    - ansible_system == 'Win32NT'
+    - ansible_facts['system'] == 'Win32NT'
 
 - name: Installer block
   when:
@@ -71,14 +71,14 @@
       delegate_to: localhost
       check_mode: false
       when:
-        - ansible_system == 'Win32NT'
+        - ansible_facts['system'] == 'Win32NT'
 
     - name: Download node_exporter binary to local folder - Linux
       become: false
       ansible.builtin.get_url:
-        url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.{{ ansible_system
+        url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.{{ ansible_facts['system']
           | lower }}-{{ go_arch }}.tar.gz"
-        dest: "/tmp/node_exporter-{{ node_exporter_version }}.{{ ansible_system | lower }}-{{ go_arch }}.tar.gz"
+        dest: "/tmp/node_exporter-{{ node_exporter_version }}.{{ ansible_facts['system'] | lower }}-{{ go_arch }}.tar.gz"
         checksum: "sha256:{{ node_exporter_checksum }}"
         mode: "0644"
       register: _download_binary
@@ -88,18 +88,18 @@
       delegate_to: localhost
       check_mode: false
       when:
-        - ansible_system != 'Win32NT'
+        - ansible_facts['system'] != 'Win32NT'
 
     - name: Unpack node_exporter binary
       become: false
       ansible.builtin.unarchive:
-        src: "/tmp/node_exporter-{{ node_exporter_version }}.{{ ansible_system | lower }}-{{ go_arch }}.tar.gz"
+        src: "/tmp/node_exporter-{{ node_exporter_version }}.{{ ansible_facts['system'] | lower }}-{{ go_arch }}.tar.gz"
         dest: "/tmp"
-        creates: "/tmp/node_exporter-{{ node_exporter_version }}.{{ ansible_system | lower }}-{{ go_arch }}/node_exporter"
+        creates: "/tmp/node_exporter-{{ node_exporter_version }}.{{ ansible_facts['system'] | lower }}-{{ go_arch }}/node_exporter"
       delegate_to: localhost
       check_mode: false
       when:
-        - ansible_system != 'Win32NT'
+        - ansible_facts['system'] != 'Win32NT'
 
     - name: Propagate windows_exporter installer - Windows
       ansible.windows.win_copy:
@@ -109,19 +109,19 @@
         owner: root
       when:
         - not ansible_check_mode
-        - ansible_system == 'Win32NT'
+        - ansible_facts['system'] == 'Win32NT'
 
     - name: Propagate node_exporter binaries
       become: true
       ansible.builtin.copy:
-        src: "/tmp/node_exporter-{{ node_exporter_version }}.{{ ansible_system | lower }}-{{ go_arch }}/node_exporter"
+        src: "/tmp/node_exporter-{{ node_exporter_version }}.{{ ansible_facts['system'] | lower }}-{{ go_arch }}/node_exporter"
         dest: "{{ node_exporter_binary_install_dir }}/node_exporter"
         mode: "0755"
         owner: root
       notify: Restart node_exporter
       when:
         - not ansible_check_mode
-        - ansible_system != 'Win32NT'
+        - ansible_facts['system'] != 'Win32NT'
 
     # 2025: the arguments have changed since the last time.
     - name: Install Windows exporter
@@ -131,7 +131,7 @@
         state: present
       when:
         - not ansible_check_mode
-        - ansible_system == 'Win32NT'
+        - ansible_facts['system'] == 'Win32NT'
       notify: Restart windows_exporter
 
 - name: Propagate locally distributed windows installer
@@ -142,7 +142,7 @@
     owner: root
     group: "{{ node_exporter_root_group }}"
   when:
-    - ansible_system == 'Win32NT'
+    - ansible_facts['system'] == 'Win32NT'
     - node_exporter_local_installer | length > 0
     - not ansible_check_mode
 
@@ -152,7 +152,7 @@
     arguments: 'EXTRA_FLAGS="--config.file ""C:\Program Files\windows_exporter\config.yaml"""'
     state: present
   when:
-    - ansible_system == 'Win32NT'
+    - ansible_facts['system'] == 'Win32NT'
     - node_exporter_local_installer | length > 0
     - not ansible_check_mode
   notify: Restart windows_exporter
@@ -166,6 +166,6 @@
     owner: root
     group: "{{ node_exporter_root_group }}"
   when:
-    - ansible_system != 'Win32NT'
+    - ansible_facts['system'] != 'Win32NT'
     - node_exporter_binary_local_dir | length > 0
   notify: Restart node_exporter

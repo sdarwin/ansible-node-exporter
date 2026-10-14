@@ -9,7 +9,7 @@
     mode: "0644"
   notify: Restart node_exporter
   when:
-    - ansible_system == 'Linux'
+    - ansible_facts['system'] == 'Linux'
 
 - name: Copy the node_exporter launchd service file
   become: true
@@ -21,7 +21,7 @@
     mode: "0644"
   notify: Restart node_exporter osx
   when:
-    - ansible_distribution == 'MacOSX'
+    - ansible_facts['distribution'] == 'MacOSX'
 
 - name: Copy the node_exporter startup script
   become: true
@@ -33,7 +33,7 @@
     mode: "0755"
   notify: Restart node_exporter osx
   when:
-    - ansible_distribution == 'MacOSX'
+    - ansible_facts['distribution'] == 'MacOSX'
 
 - name: A configure block
   when:

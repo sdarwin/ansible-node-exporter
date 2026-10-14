@@ -34,4 +34,4 @@
   become: true
   ansible.builtin.meta: end_host
   when:
-    - ansible_distribution == 'FreeBSD'
+    - ansible_facts['distribution'] == 'FreeBSD'

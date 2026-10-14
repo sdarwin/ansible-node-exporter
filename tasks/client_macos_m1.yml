@@ -47,5 +47,5 @@
   become: true
   ansible.builtin.meta: end_host
   when:
-    - ansible_distribution == 'MacOSX'
-    - ansible_architecture == 'arm64'
+    - ansible_facts['distribution'] == 'MacOSX'
+    - ansible_facts['architecture'] == 'arm64'

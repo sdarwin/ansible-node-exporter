@@ -3,14 +3,14 @@
   ansible.builtin.include_tasks:
     file: client_freebsd.yml
   when:
-    - ansible_system == 'FreeBSD'
+    - ansible_facts['system'] == 'FreeBSD'
 
 - name: Client MacOS
   ansible.builtin.include_tasks:
     file: client_macos_m1.yml
   when:
-    - ansible_distribution == 'MacOSX'
-    - ansible_architecture == 'arm64'
+    - ansible_facts['distribution'] == 'MacOSX'
+    - ansible_facts['architecture'] == 'arm64'
 
 - name: Preflight
   ansible.builtin.include_tasks:
@@ -24,7 +24,7 @@
   ansible.builtin.include_tasks:
     file: configure_windows.yml
   when:
-    - ansible_system == 'Win32NT'
+    - ansible_facts['system'] == 'Win32NT'
   tags:
     - node_exporter_configure
 
@@ -36,7 +36,7 @@
     ( (__node_exporter_current_version_output.stderr_lines | length > 0) and (__node_exporter_current_version_output.stderr_lines[0].split(" ")[2] != node_exporter_version) ) or
     ( (__node_exporter_current_version_output.stdout_lines | length > 0) and (__node_exporter_current_version_output.stdout_lines[0].split(" ")[2] != node_exporter_version) ) or
     ( node_exporter_binary_local_dir | length > 0 ) ) and
-    ansible_system != 'Win32NT'
+    ansible_facts['system'] != 'Win32NT'
   tags:
     - node_exporter_install
 
@@ -48,7 +48,7 @@
     ( (__node_exporter_current_version_output.stderr_lines | length > 0) and (__node_exporter_current_version_output.stderr_lines[0].split(" ")[2] != node_exporter_version_windows) ) or
     ( (__node_exporter_current_version_output.stdout_lines | length > 0) and (__node_exporter_current_version_output.stdout_lines[0].split(" ")[2] != node_exporter_version_windows) ) or
     ( node_exporter_binary_local_dir | length > 0 ) ) and
-    ansible_system == 'Win32NT'
+    ansible_facts['system'] == 'Win32NT'
   tags:
     - node_exporter_install
 
@@ -59,7 +59,7 @@
   vars:
     _common_selinux_port: "{{ node_exporter_web_listen_address | urlsplit('port') }}"
   when:
-    - ansible_system == 'Linux'
+    - ansible_facts['system'] == 'Linux'
     - ansible_facts['selinux'].status == "enabled"
   tags:
     - node_exporter_configure
@@ -70,7 +70,7 @@
   tags:
     - node_exporter_configure
   when:
-    - ansible_system != 'Win32NT'
+    - ansible_facts['system'] != 'Win32NT'
 
 - name: Ensure Node Exporter is enabled on boot
   become: true
@@ -81,7 +81,7 @@
     state: started
   when:
     - not ansible_check_mode
-    - ansible_system == 'Linux'
+    - ansible_facts['system'] == 'Linux'
   tags:
     - node_exporter_run
 
@@ -91,5 +91,17 @@
     launchctl load /Library/LaunchDaemons/cloudalchemy.mxcl.node_exporter.plist
   changed_when: false
   when:
-    - ansible_distribution == 'MacOSX'
+    - ansible_facts['distribution'] == 'MacOSX'
     - not ansible_check_mode
+
+- name: Ensure windows_exporter is started
+  ansible.windows.win_service:
+    name: windows_exporter
+    state: started
+  # Intentionally no start_mode: keep the upstream MSI's
+  # Automatic (Delayed Start) registration.
+  when:
+    - not ansible_check_mode
+    - ansible_facts['system'] == 'Win32NT'
+  tags:
+    - node_exporter_run

@@ -7,7 +7,7 @@
     state: restarted
   when:
     - not ansible_check_mode
-    - ansible_system == 'Linux'
+    - ansible_facts['system'] == 'Linux'
 
 - name: Restart node_exporter osx
   ansible.builtin.shell: |
@@ -18,7 +18,7 @@
   changed_when: false
   when:
     - not ansible_check_mode
-    - ansible_distribution == 'MacOSX'
+    - ansible_facts['distribution'] == 'MacOSX'
 
 - name: Restart node_exporter osx homebrew
   ansible.builtin.shell: |
@@ -29,7 +29,7 @@
   changed_when: false
   when:
     - not ansible_check_mode
-    - ansible_distribution == 'MacOSX'
+    - ansible_facts['distribution'] == 'MacOSX'
 
 - name: Restart windows_exporter
   ansible.windows.win_service:
@@ -37,4 +37,4 @@
     state: restarted
   when:
     - not ansible_check_mode
-    - ansible_system == 'Win32NT'
+    - ansible_facts['system'] == 'Win32NT'

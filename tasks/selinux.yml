@@ -10,7 +10,7 @@
   retries: 5
   delay: 2
   when:
-    - (ansible_distribution | lower == "redhat") or (ansible_distribution | lower == "centos")
+    - (ansible_facts['distribution'] | lower == "redhat") or (ansible_facts['distribution'] | lower == "centos")
 
 - name: Install selinux python packages [Fedora]
   ansible.builtin.package:
@@ -24,7 +24,7 @@
   delay: 2
 
   when:
-    - ansible_distribution | lower == "fedora"
+    - ansible_facts['distribution'] | lower == "fedora"
 
 - name: Install selinux python packages [clearlinux]
   ansible.builtin.package:
@@ -35,4 +35,4 @@
   retries: 5
   delay: 2
   when:
-    - ansible_distribution | lower == "clearlinux"
+    - ansible_facts['distribution'] | lower == "clearlinux"
